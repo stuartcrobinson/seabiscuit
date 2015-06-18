@@ -1,0 +1,839 @@
+KO - 
+
+http://www.thestreet.com/story/13039617/1/what-to-expect-when-coca-cola-ko-reports-earnings-results-tomorrow.html
+expected eps $0.42, revenue: $10.76B
+
+same as yahoo! :)
+
+http://assets.coca-colacompany.com/71/d8/cdb028f142de98572dd5a1a65e31/2014-q4-and-full-year-results.pdf
+now check KO earnings report ... (goal is to learn how to read reported quarter EPS and future year guidance EPS (or revenue) - parallel goal - look for early releases
+
+--listed current EPS as "comparable" ("Fourth quarter reported EPS was $0.17; comparable EPS was $0.44") -- mentioned revenue for 2015 would be slightly higher than 2014 - in text like that.  matches yahoo estimate
+
+
+CVS - 
+
+http://investors.cvshealth.com/~/media/Files/C/CVS-IR/documents/q4-2014-earning-document/4q2014-earnings-release.pdf
+http://tickerreport.com/banking-finance/411140/cvs-health-corp-cvs-posts-earnings-results-beats-expectations-by-0-01-eps/
+
+yahoo estimates are right.  
+
+UBS - stock fell after report came out despite beating expectations.  explanation is swiss franc is too strong, interest rates too low.  but we knew that a week ago.  UBS reported vaguely warning about that,
+but it didnt seem like new info.  maybe real estimate was higher than what americans think?  very strange.  
+
+summary notes so far:  it looks like yahoo estimates are reasonable.  challenge:  how to get report the fastest (get ready to watch this afternoon's reports),  how to determine company's future outlook
+ (sometimes they say numbers, sometimes vague phrases).  easy challenge:  per company per upcoming release - set up webscraper to pull out specific data in specific spot, based on format of previous release.
+  predict the website link, start going there before it gets published.  company page and newswire service and other newswire servicde?  (like the insurance news thing w/ Loews)
+  
+next - prepare for this afternoon's releases.  pick stocks to watch.  determine estimates.  predict report links.  get supposed release time.  act like automated trader, check results.  
+ - prepare for stocks reported on that insurance news newswire service.  maybe they are posting early, and only them.  note:  it looks like CocaCola's pdf report had a cryptic URL for this purpose. to prevent this.
+ 
+
+ UPCOMING:
+ 
+CERN - 4:30 PM
+EPS:
+yahoo:
+qrtr: 0.47
+2014: 1.65
+2015: 2.12
+
+estimize "wall st"
+qrtr: 0.47
+
+zacks:
+Current Qtr Est	0.43
+Current Yr Est	1.89
+Qtr Earnings ESP[?]	0.00%
+Exp Earnings Date	*AMC2/10/15
+Prior Year EPS	1.46
+
+http://www.bidnessetc.com/27932-cerner-corporation-down-on-earnings-miss/
+article from prev release uses the estimize number - probably same as yahoo estimate.  not zacks
+
+lets just use the higher one. so eps 0.47 is one to beat.  rev: 906.78 (use yahoo numbers)
+
+Reports Financial and Operating Results for the Fourth Quarter and
+
+Read more: http://www.nasdaq.com/press-release/ramcogershenson-properties-trust-reports-financial-and-operating-results-for-the-fourth-quarter-an-20150210-01194#ixzz3RNeWspW8
+
+
+
+TODO --
+
+
+(I)  screener
+
+a.  xVars
+- change xfilters filter to accept:
+--- comparators (<, >, <=, >=, ==)
+--- variable names
+--- operators (*, /, +, -)
+
+b.  yVars
+- allow "abs:" like this:  futChange_1day, abs:futChange_1day
+
+c.  z! threshold compliance
+- like for getting the pct of times that the y-var was greater than 0.  0 is z. 
+
+
+(II)  downloaded data
+
+include more earnings data!  full stuff (from zacks?) - release date, time, estimate eps, reported eps
+
+also get inst ownership, prior PE, cap, 
+
+historical: 
+-zacks, whispernumber, estimize
+
+realtime:
++ yahoo
+
+- check report date.  make sure daysSinceReport is 0 on first trading day following report release.  daysUntilReport is 0 on last day before release. 
+
+- update EPS quarterly!
+
+- download FULL DESCRIPTION from reuters: http://www.reuters.com/finance/stocks/companyProfile?symbol=SCOR
+- download the basic description from the yahoo profile page.
+
+
+for date, time, estimate, actual
+- http://www.zacks.com/earnings/earnings-calendar - fast page loads, ajax
+- https://www.estimize.com/calendar/2008/2/14/ - slower, not ajax.  missing data.  is estimated revenue predictive of stock price ch?
+- yahoo:  no estimates
+- nasdaq: no time of 
+
+download competitors!  - use this as category alternate to industry/sector?
+http://quotes.morningstar.com/stock/xom/s?t=XOM
+
+maybe useful?  http://www.nasdaq.com/earnings/report/twtr
+
+
+(III)  trading techniques
+- long straddle: options technique to profit when stock goes either up or down.  use z/threshold compliance to study.  remember from finviz porfolios:  stocks that plunged are likely to go wild next day.
+		- for a long straddle to make a profit, the absolute value of the price change must be twice the price of the underlying option
+		- NA for IPOs.  might work for companies whose price just plunged or soared
+- trade earnings reports.  check post-release price change correlation with:
+---- cap. -- supposedly 70% of SP500 stocks beat earnings estimates.  rigged game = inefficient?  but probably prices are smarter than the "surprise"
+---- release weekday -- maybe companies bury bad report on friday? happened in 90's supposedly
+---- number of recent or accompanying press releases -- trying to bury bad news.  or "walk down" the estimates
+- intraday questions - if low is x% down from open, how often is close y% up from low?  what is av low-to-close rise? <--- per: PE, cap, prev price behavior, etc
+- buy before SEC release if estimize is higher than street estimates?  for PE? for revenue?  revenue maybe more reliable?
+- game estimize/whispernumbers?  make thousands of accounts, etc.  probably pointless.  probly no one watching estimize.
+- on estimize:  where estimize estimate vs. corporate guidance (bad news if estimize < c.g. ?)
+- does price reliably fall when estimize < street?  (very rare!)
+- buy biggest companies per sector or category.  esp before earnings?
+- if hi is much higher than open and close.  and low equals open or close.  and close is higher than open.  --> increase the next day?  check trulia feb 2 and tomo (feb 13).  opposite: NNN jan 30, 
+- how bout when low < open, and close = high? etp jan 29. 
+
+(IV)  further study
+- see how PE and revenue surprises correlate with price change at open and also at close of next day. (estimize and zacks)
+- see how PE and revenue spreads (estimize vs. wall st) correlate with price change at open and also at close of next day. (estimize and zacks)
+- what if co. with high PE has a higher post-SEC open than prev close. how often will price fall back down? 
+- see if report presence of any of these words is related to price change:  "pressur, slip, challeng, stress", "buyback." esp if open is high, and report has these words.  will close be lower than open? after traders read the fine print
+- see if any insurance news net earnings reports are released early
+- care about twitter?  stocktwits?
+- figure out:  if i own a stock -- should i set a sell limit order each day for x% above open?  if: not sec report date, etc, PE above certain amount?, etc
+
+(V)  notes
+- avoid trading on disappointments.  too risky.  stocks often rise even after negative surprise. 
+- far future: live earnings trading.  watch for: qr PE, future revenue or PE, negative words.
+- prices don't rise after positive earnings surprise because everyone knows earnings estimates are deflated. ?
+- sector/industry breakdowns arent that great.  nothing for business data analysis?  do text clustering analysis on Description to get better categories.  http://www.cytoscape.org/ http://textexture.com/ http://www.tapor.ca/?id=9
+----- categorize companies based on:  (0) competitors: http://quotes.morningstar.com/stock/xom/s?t=XOM, (i) brief google description,  (ii) huge annual report text, (iii)  CPEPCC (correlated post-earnings price change category), CPCC (correlated price change category) :) stock price movement correlation (several corrs:  dayCh, wkCh, moCh, 3moCh, 6moCh), (iv) reuters full text, (v) google related companies
+- buy cautiouscapital.com? 
+- make website to cluster various texts
+
+.... one big goal with categories is to predict price change after earnings release.  to go off same-quarter releases of other stocks in same category.  
+....	so one category method could be correlations of companies' post-earnings price change.  maybe that's more direct.  much less data tho.  how far back can we get earnings releases?  pretty far.  
+....    i bet the "surprise" is mostly meaningless. lets forget about report-reading for now.  unless we can somehow break in to companies' servers and get info early.  probly can't win a direct race against wall st.
+.... seek opportunities in small stocks.  those will likely have less big-bank trading. 
+- when a company beats earnings expectation, the price might peak in the morning and then fall throughout the day as investors read the fine print.  yahoo january 27/28 2015
+- surprise is meaningless, becuase revenue could still plummet - aol feb 11 2015
+- look for revenue surprises in estimize.  is predicted revenue telling at all?
+- sina - great financials 2014-11-13 but bad guidance.  price dropped a lot
+
+(V.I)  future automated data grabs:
+DAILY
+ - save all news and press releases INCLUDING timestamp! use google feed? or alternate so we don't get blocked.  yahoo, morningstar, zacks?
+ - connect to rss feeds from all news release sites?  no this won't do cos some companies don't use those. like coke
+ - zacks' ESP
+ - various sources' buy/sell ratings
+ - minutely price changes
+WEEKLY
+ - glassdoor executive approval rating
+QUARTERLY
+ - managers & their salaries
+YEARLY
+- morningstar quarterly & annual financials and key ratios. 
+
+
+
+no don't do this: stop reading
+(VI) create document clusterer
+- per document:
+	- retain all capitalization except for first sentence word's first letter.
+	- make simple frequency map.
+- for all documents
+	- remove shared words.  1 occurrence at a time (not word at a time)
+	- normalize word count.  so each document has same number of total words.  allow decimals.  
+	- weight documents:  1 point per shared word.  
+	- i actually don't need clusters.  just similar stocks per stock.  pick reasonable weights cutoff.  wait ... how does google do this?
+- ... no, just use google "related companies"
+
+(VII) invest in IPO's led by harvard grads http://www.cnbc.com/id/102424057
+(X) websites i want to make
+- ebay bidder (alerter + bidder)
+- chartered flights market - skybay --> sell private direct flight seats on kayak
+- document clusterer
+
+
+
+TODO
+
+note:  if no data, don't write header.  or, delete header.  or delete file and write and empty file to get deleted later.  or, should flag files to-be-deleted?
+
+.....fuck.  how to handle: webpages that don't load, webpages with empty data.  when should a webpage be re-visited?  
+
+1.    update screening filter -- allow operators, conditionals, variable names, and OR
+2. X  download MS quarterly (nightly)
+3.    convert to quarterly EPS's
+3. X   download google and yahoo news with timestamps.  with permanent archive.  with update option.
+
+
+
+press releases? yahoo
+
+4. X   download google's related companies and factset's categories (once! with nightly updates for missing companies)
+4. X    download yahoo's earnings calendar history - datetimes only (once! with nightly updates).  i think yahoo is most reliable.  not sure.
+3. X   download zacks earnings history (once!)
+4. X   download estimize earnings history (once!)
+4. X	download all sec report types and dates and times.   remember brk.a = brka.  brk.b = brkb.  both work (same data probly?)
+5. X 	turn managers into a permanent archive file.  use secreports as template. --  deal with Management class.  delete this? replace with list of Managers aw3awefawefwaef3434f (search term).- expand to store manager gender.  (definitely female) vs. (not definitely female)
+6. X	get managers school history from bloomberg.  also get isfemale, dr, phd, md, and #'s of affiliations w/ other board members, companies, etc
+5. X     combine earnings histories into one file
+12. X  download minutely data!  set calendar reminder.  do this every 15 days.  normalize re: splits using yahoo daily. 
+6.  X   keep cleaning!  walk through objects.  read notes
+7.		check google profile filereader
+9.		after earnings are downloaded, for past earnings, calculate the percent change in stock price from before the announcement, to the next close after announced.  do this manually (in java) with saved prices, and update the permanent earnings archive.  should we do this while downloading?  no, cos i might not have prices downloaded yet
+9.		cook earnings countdown.csv and earningsDate.csv (per stock)
+10.		build CategoryEarningsResponse object and write X cooker - calculate a stock's category's cumulative average post-earnings price threshold-cross rate for a given release season.
+7.		establish others' cooked-data subclasses.  objects to list in squisher.  use them to cook the data and read it. build these!
+14. 	 add variables: revenue, to get  profit margin (%, profit/revenue) == earnings/revenue ??  net income = earnings?
+
+
+from KEY RATIOS
+revenue, net income, shares,										bps, 								fcf, working capital.  				REDUNDANT: eps
+
+from FINANCIALS
+revenue, net income, diluted weighted average shares outstanding,	total stockholders' equity / dwaso,	fcf, ???							REDUNDANT: diluted earnings per share
+
+squish:
+- CEO schools data
+- ms annual key ratios
+- ms quarterly financials
+
+later:
+1.		really think about failure handling.  how do i know when i need to try to get a ticker again or not?  absense of final file? absense of completed dummy?  presence of failure note? how to record failure?  in the text file?  or save a dummy file like successes -- just when i get an exception?  each downloader will respond to different types of failures differently :/
+4.    download nasdaq's reported earnings dates and history!  only shows past 4 quarters :(  and no times :(  but more complete than yahoo or zacks (brk missing everywhere but nasdaq).  use SEC report dates to fill in times for dates where either yahoo and zacks dno't list times, or where they disagree on before vs. after close
+14.  download list of stock names from vanguard holdings. (growth or value, no index).  match vanguard stock name with stock ticker.  save in a permanent reference file.  edit manually.
+14.   get after-hour prices.  how??????????????
+15.  use internet archive's way back machine to get old stock news
+16.  incorporate ceosschools
+16.  determine managers' gender
+4.   download upcoming ipos.  add them to symbols list.  http://www.nasdaq.com/markets/ipos/activity.aspx?tab=upcoming.  works for upcoming: http://www.google.com/finance?q=nyse:sum this DOES NOT WORK: http://www.google.com/finance?q=sum so -- must know the exchange
+		-add upcoming IPO stock names to symbols list.  down their related companies.  look for patterns in ipo behavior related to related companies
+		--note:  on google finance, new companies might not show until day AFTER ipo! :(  (shak)
+		-- will be hard or impossible.  shitty data for new companies on yahoo and google both
+11.   run prices correlation study on all stocks w/ each other to make new category. daily price changes only.
+17.	get splits announcement date
+----------------------------------------
+
+12.  major shift - don't re-download all data every night.  have permanent databanks:  news dates, google's related companies, executive bios (school, past pay?).  everything changes per stock splits.
+5.  download news date/time (once!) (then update nightly - recent stuff only)
+5.  download press release date/time (once!) (then update nightly - recent stuff only)
+5.  download google's "related companies" (quarterly!) ... (update nightly for missing companies)
+5.  download google's industry classification (quarterly!) ... (update nightly for missing companies)
+8.  decide:  use google vs. yahoo industry classification?
+9.  convert to use quarterly EPS
+10. calculate  ... will be complicated ... calculate a stock's category's cumulative average post-earnings price threshold-cross rate for a given release season.  so, if twitter and fb are in the same asset class, and twitter had a huge jump in price after earnings release, maybe fb will have a jump after it's release later in the season.
+11.  determine where CEO's went to school! http://www.cnbc.com/id/10242405713.  ipos - when do they outperform on/near release day? how could i easily study this w/ my data?  make new column:  stock age.  0 is first day of trading.  shake shak price decline - harmonic motion? https://www.google.com/finance?q=NYSE%3ASHAK&ei=0k_eVJG5B8imsQe364DYCA
+		- 1.  wiki page
+		- 2.  linked in? -unreliable.  don't get updated. 
+		- 3.  google search, biography, alma mater
+		- 3.  make list of all universities.  then do google search for "elon musk ceo tesla alma mater".  determine which university(s) is/are mentioned most within the first few pages
+		- http://www.bloomberg.com/research/stocks/private/person.asp?personId=1537561&privcapId=66082269&previousCapId=419781&previousTitle=SYNNEX%20CORP - under Education
+		
+		START HERE
+
+  quarterly data?  checking sec ... not feasible.  too many text variations http://www.sec.gov/cgi-bin/viewer?action=view&cik=1288776&accession_number=0001193125-12-440217&xbrl_type=v#
+
+WAIT .... what about companies whose quarterly reports are released in 8-k instead of 10-q?  fuck.  which one was that ...
+so ......... fuck.  it looks like earnings are frequently release ahead of the "quarterly report," in the "current report" (8k).  so it is pointless to search SEC for report filing code.
+need to use retail website that lists earnings release date.  dang it.  so i think i have to use POS zacks after all.  
+whispernumber: incomplete historical data
+nasdaq:  missing times
+morningstar:  only current year
+zacks:  shitty data
+yahoo:  no estimates OR actual
+
+
+NOTES - 
+quarterly:
+reuters EPS is using diluted continuing operations per share.  (vs. basic net income per share which includes discontinuing operations)
+MS:  diluted net income per share
+google finance displays net income per share
+zacks:  no fucking idea
+estimize:  no fucking idea
+
+...maybe we shouldn't use estimize or zacks anymore
+
+ideally ... use reuters for past 8 quarters, and MS for past 10 years.  but reuters uses continuing operations, while MS uses 
+net income (includes discontinuing operations).  how to reconcile w/out paying $200 for MS subscription?
+NOTE:  reuters has fwd estimates also!
+
+TODO -- use quarterly EPS from now on!  use real quarterly data for past 5 quarters from MS.  for qrs before that, just divide the yearly EPS by 4.  
+after everything is completed and working, get the 14 day MS trial to get past 10 quarters for temporary research.  
+
+it would really be great to get more historical EPS's.... lets see if we can make any fucking sense of zacks' numbers...
+akamai - 0.01 from basic net income per share
+no.  zacks data is wrong.  their numbers come from no where.  see BGG, briggs & stratton if anyone needs proof.  
+http://www.zacks.com/earnings/earnings-calendar
+jan 21, 2015
+http://www.sec.gov/Archives/edgar/data/14195/000001419515000002/pressrelease-q2fy15.htm
+http://financials.morningstar.com/income-statement/is.html?t=BGG
+what's strange is that zack's and estimize often have the same numbers.  maybe they actually do mean something -- are correct somehow?  
+but there's no way to get those numbers from the "Consolidated Statements of Operations for the Fiscal Periods Ended December"
+maybe estimize is just using zack's numbers.  probably.  pieces of shit.  btw today i noticed that finviz wasn't adjusting for stock splits.  pieces of shit.  avoid these new flashy finance sites.
+
+wait wtf.... morningstar earnings calendar shows same numbers as zacks... WHAT THE FUCK
+EPS's on morningstar earnings calendar are different from anything on morningstar's actual page for a given stock.   bgg jan 21 as example.  wtf is 0.26?
+oh fuck it says on the page that this shit is from zacks.  wtf.  am i the only person actually using this shit
+
+also, sometimes estimize shared yahoo finance estimates.  sometimes it shared zacks.  which were different.
+
+yearly! past 5 years :) :) :)
+http://financials.morningstar.com/ajax/ReportProcess4CSV.html?t=AAPL&region=USA&culture=us_EN&productCode=COM&reportType=is&period=12&dataType=A&order=asc&columnYear=5&curYearPart=1st5year&rounding=3&view=raw&denominatorView=raw&number=3
+
+quarterly
+http://financials.morningstar.com/ajax/ReportProcess4CSV.html?t=AAPL&region=USA&culture=us_EN&productCode=COM&reportType=is&period=3&dataType=A&order=asc&columnYear=10&curYearPart=1st10year&view=raw&denominatorView=raw&number=3
+
+in thousands not millions
+http://financials.morningstar.com/ajax/ReportProcess4CSV.html?t=AAPL&region=USA&culture=us_EN&refresh=false&productCode=COM&reportType=is&period=12&dataType=A&order=asc&columnYear=5&curYearPart=1st5year&view=raw&denominatorView=raw&number=3
+
+http://financials.morningstar.com/ajax/ReportProcess4CSV.html?t=AAPL&reportType=is&period=3&dataType=A&columnYear=5&curYearPart=1st5year&number=3
+
+http://financials.morningstar.com/ajax/ReportProcess4CSV.html?t=AAPL&reportType=is&period=12&dataType=A&columnYear=5&curYearPart=2nd5year&number=3
+
+http://financials.morningstar.com/ajax/ReportProcess4CSV.html?t=AAPL&region=USA&culture=us_EN&refresh=false&productCode=COM&reportType=is&period=12&dataType=A&order=asc&columnYear=5&curYearPart=1st5year&view=raw&denominatorView=raw&number=3
+
+http://financials.morningstar.com/ajax/ReportProcess4CSV.html?t=AAPL&reportType=is&period=12&dataType=A&columnYear=10&curYearPart=2nd5year&number=3
+http://financials.morningstar.com/ajax/ReportProcess4CSV.html?t=AAPL&reportType=is&period=6&dataType=A&columnYear=10&curYearPart=1st5year&number=3
+
+
+virgin
+
+check out brk.b on feb 17 2015.... the price jumped at the very last moment.  looked like a computer's trade.  the pattern for the day had been high  mid-day high, much higher than open or close.
+--->  exactly what i was thinking about having a program look in to.
+
+
+	    //now find new newses since dateSt.  including dateSt!
+	    
+	    //TODO start here!  combine this and next function.  first, per ticker, get first row of news file.
+	    // go back and sort by date_time string!  so most recent 
+	    // fuck idk.   how can we know if a news file needs to be checked again?  
+	    
+	    //maybe we can't.  can't just do things several times like other downloaders and hope they eventually get all the data.
+	    //only get one shot
+	    
+	    //then get google related companies.  only update as needed
+	    
+	    //then get earnings data (zacks yahoo? idk check notes)  update as needed
+	    
+	    //then figure out categories' quarterly cumulative average post-earnings release price change
+	    
+	    //then beef up the screener
+	    
+	    //then incorporate new data into squished file.  
+
+
+
+
+
+http://www.bloomberg.com/research/stocks/people/person.asp?personId=1540690&capId=21835&previousCapId=21835&previousTitle=MICROSOFT%20CORP
+http://www.bloomberg.com/research/stocks/people/person.asp?personId=1540690&symbol=MSFT:US
+
+
+
+2014-Present
+Director and Member of Governance & Nominating Committee
+
+Microsoft Corporation
+
+
+
+bloomberg data:
+
+-	go to main people page - scrape list of all person id's
+-	go to Overview - get all ppl id's in set
+- 	go to Board Members - add all ppl id's to set
+
+go to each person's page -- get:
+	- Board Memberships (when, title, place)
+	- education: (degree, place)
+	- Other Affiliations (one line per affiliation)
+	
+	
+	now .... bloomberg is a really shitty website.   frequently pages fail to load.  do anything special besides the normal double-try?
+	... after program is finished - go through all managers ticker files.  
+	... save failed bloomberg links in a special folder.  afterwards, go through these links and try them again.  clear out the dead links page.
+	.... can we distinguish between a page that really doesn't exist vs. one that doesn't load?
+	- yes i think so.  going to bogus page takes you here: http://www.bloomberg.com/research/people/overview/overview.asp or here http://investing.businessweek.com/research/common/symbollookup/symbollookup.asp?textIn=brka
+	  - but when a real page doens't load, it says something about file missing ".
+	  
+	  note: these work for brk.a:
+	  http://www.bloomberg.com/research/stocks/people/people.asp?ticker=BRK/A
+	  http://www.bloomberg.com/research/stocks/people/people.asp?ticker=brk.a
+	  
+	  save ticker in the failed links file?
+	  
+	  get personID's from text.  regex.  no i want their names to check managers list ...
+	  
+	  extract first and last name from bloomberg names that are like John M. Smith Jr.
+	  
+	  
+	  
+	  
+DATA STRUCTURE
+
+- make final data structure like this:
+
+ - a list of StockData
+ - where Stockdata is an object that contains a list of varobjects.  AS THE LIST IS BEING FORMED, the object records its final output column index.
+			-- so i can move vars around w/out meticulous column index editing
+ 
+ -varobjects are like open, close, PB, etc.  should be similar to as now.  they will have a data array - of different types - and methods for creating and modifying their data
+ 
+ the goal is to have one data format that is used for both research and production.  can be read from file, or built from separate data sources and analyzed directly.
+ 
+ do NOT use single data matrix.  wasteful - there will be unused reserved data space for young companies.  
+ 
+ 
+ read prepared data as list of objects.  then convert that list to data array using the varObject's method
+ 
+ 
+ should EVERY downloader be in a separate file?? no
+ 
+ 
+ FAIULRES:
+ 
+- overall, there are two main failure cases:
+
+1.  it was a good ticker symbol.  something weird happened and it didnt load right but we should try again later.
+2.  it was a bad ticker symbol.  data wasn't returned because it doesn't exist and it never will.  don't try again later.
+
+all files SHOULD be updated with logical failure cases
+
+
+News
+
+class X{
+
+data regarding news i want to actually study
+
+public X(String ticker){}
+
+
+methods:
+
+cook(){
+//read data from disk and write cooked data -- data that fits X's attributes identically.  that X can read as an object, and be listed out
+ 
+//note - some classes, the data is already cooked.  still make an X object but just have all the method meats be empty.  we'll create the objects and call them on all tickers, but i'll go by real quick cos nothing there
+}
+
+}
+
+
+what about minutely data?  should i be ignoring it?  should i make systems now that can easily adapt it later?  probably.
+
+hmmm that will be too much data to have replicated info per line.
+
+maybe this is stupid to plan on doing it like that.... maybe i should essentially build relational database in java.  so like, don't repeat the EPS for every day of a quarter.  
+
+for financial data - make new variable: (byte) Era (1, 2, 3, 4, 5, ...).  match the era # to morningstar financial data.  wait will that work what about splits? yeah0 it'll work, past is all adjusted.
+
+what else can we use era for .... financials, profile (google & yahoo), person,  -- remember era #s will be different per ticker.
+
+storage, files:
+
+NOTE:  For Dates in cooked files for events like SECReports and Earnings -- the Date should be the Date of the first close of a trading day that occurs after the event.  so if an SEC report came out at 5 pm one day, its cooked date would be the next trading day.
+
+
+make these as soon as data finished downloading.  save individual objectX data files AND one massive dataset with everything combined.
+
+each objectX has ability to load from Xfile.  OR loaded from massive datafile by some new enmassloader object.  or built/calculated from raw files
+
+so objectX can be loaded from:
+
+1.  waterfall from raw(this happens right after download.  doing everything together, in memory).  maybe it should actually be done DURING downloads?  save two files.  raw and cooked.  already in memory- avoiding taking time to read raw file
+2.  waterfall from Xdata
+2.  xfile	- in case all the Xs are built but i want to change some tiny thing somewhere.  then all load from their individual files.  actually, from waterfall-from-xdata since that change will probably have ramifications somewhere
+
+well aagh idk.  each xobject built differently.  each either read raw files (and do full computation), read some raw & some cooked files (do some computation), or read only cooked files (no computation)
+
+challenge:  figure out:  how to deal with eras!?  while using master central data file?
+
+so ... it'll be in its column.  i'll know which parser to send that column to.  that parser is attached to an xobject.  a custom parser that should be able to do the work.  knows the name of the repository file,
+		and ... wait, actually no we want to just leave the era# in there.  it will be hard-coded in the reader to read the era files as maps.  then only during analysis will they be connected
+		
+the following stuff is like --> blahblah.csv (stuff, stuff2) ---- but it doens't necessarily need to be written to individual file.  stuff and stuff2 are just the component arrays
+		what WILL need to be file-written are the era files.  
+		
+tomorrow:  for each object, write:
+
+ the objectX constructor that inputs only RAW FILES.
+ the objectX constructor that inputs OBJECTS wherever possible (will still need to input core RAW FILES).
+ the objectX printer that writes the objectX to disk.
+
+
+ i think i used to think that xObjects would be lists of objects, just like the original.  like each having a couple data points for one line regarding one date.
+		but im thinking now that xObjects will just hold arrays.  so they won't be ideal for manipulation outside of the data analysis.  
+		so even tho the cooked SEC file will be smaller than raw, i'm planning on using the raw SEC file for the earnings cooker cos it seems easier to have the nice list of little objects
+			earnings will also need to use priceChangePct's.  it seems like it'd be easier to use List<Prices> and just recalculate the priceChanges.  but maybe that's stupid and wasteful and i should 
+			use the xPrices that already calculated this?   but it would be a bitch to deal w/ the arrays i think... maybe not.  maybe think about which form would be more likely to have quick access to 
+			when i'm ready to build the xEarnings.  it will probably be faster to read the raw prices file and recalculate priceChange than to read the cooked version that already has it, since slower to read
+ 
+ 
+ 
+1. 	Prices:		-- must do this first to get valid trading dates.  possible inputs: prices file OR prices List<String> (add an http... downloadFile(...) that will ALSO return the file contents (instead of just void)
+
+		TempX --> Prices -->NEEDSPRICES ticker.csv (originals + avVol2wk, AG_3, EMA_(3, 5, 9, 20, 50, 200, 3m5, 3m9, 3m20, 3m200), priceChangePct_(day, week, month, 3months), futChangePct_(intraDay, day, 2day, week, 2week, month, 2month, 6month year) 
+
+2.	financials (use map):		--NEEDSPRICES -- possible inputs:  trading (price) dates (from file OR (list or array var)), financials (Financials object via file )
+
+		TempX --> Financials --> Ticker --> data.csv (date, PE, PB, PFCF, era#), era#.csv(dates in this era, EPS, profit margin (profit/revenue)). ....ignore: (later for minutely stuff, i might do it like this:  or maybe 1 value per day (extract from map): <Era#.csv (dates (all the dates that apply to this era) and financials)>)
+
+2.	profile (use map):			 trading (price) dates (from file OR (list or array var)), GoogleProfile object, YahooProfile object (from files)
+
+		TempX --> Profile --> Ticker --> Era#.csv (dates, google related companies, google sector, google industry, yahoo sector, yahoo industry). internal var: isFull - true if values for all vars
+
+2.	person (use map):			 trading (price) dates (from file OR (list or array var)), people list (from file via readPeopleFile(ticker))
+
+		TempX --> People --> Ticker --> Era#.csv (dates, age1, age2, ageCEO, ageAvAll, duration1, durationCEO,  isFemale1, isFemale2, pctFemale5, pctFemaleAll, isFemaleCEO, pctPhD3, isCEO_PhD, pctMD3, isCEO_MD, pctDr3, isCEO_Dr, isCEO_Harvard, ceo_numConn_BoardMembers, ceo_numConn_Organizations, totalNumPeople, avgNumBoardRelationships (for ppl whose relationships is greater than 0 = board members), totalNumberBoardMembers
+
+2.	SECReports:			 trading (price) dates (from file OR (list or array var)),   List<SECReport> readSecReportsFile(String ticker) (from file)
+
+		TempX --> SECReports --> ticker.csv: (cookedDate, (byte) # of reports released, list of the different report types released today (filter program will need a "contains" function for checking list elements)
+
+2.	Short Interest:				cookeddates (increment 1 biz day - reports come out after 4 pm) (from file OR (list or array var)),    List<ShortInterest> readFile(String ticker) 
+
+		TempX --> Short Interest --> ticker.csv (date, numDaysSinceRelease, previousDaysToCover) --------- no era!  this is like secreports ---- -(removed numDaysUntilRelease -- redundant!!! since SI's get released every 2 weeks)
+
+2.	Splits:			 trading (price) dates (from file OR (list or array var)),     List<Split> readFile(String ticker) 
+
+		TempX --> Splits --> ticker.csv (date, daysUntilGoodSplit, daysSinceGoodSplit, daysUntilBadSplit, daysSinceBadSplit)
+
+2.	News:			 trading (price) dates (from file OR (list or array var)),      List<News> readNewsFile(String ticker) 
+
+		TempX --> News --> ticker.csv (cookedDate, numTotalArticles, numTotalNonShittySources, numPressReleases, numArticlesThatContainCompanyNameOrTickerInTitle, (and then variables for daysSince an article was published for each of those categories)
+
+3.	earnings:			 trading (price) dates (from file OR (list or array var)),        List<SECReport> readSecReportsFile(String ticker) (from file)
+
+		TempX --> Earnings --> Ticker -->NEEDSSEC countdowns.csv (date, numDaysUntilEarnings, numDaysSinceEarnings), EarningsDate.csv (current earnings stuff + priceChangePct, # of [any] SEC reports during the 2 weeks prior)
+
+4.	categoryEarningsResponse:		--needs PRICES EARNINGS
+
+		TempX --> CategoryEarningsReponse  --> categoryName.csv (date, priceChangePct, n, pct>0%, pct>2, pct>4) note: 4 base cats then 1 per stock for grc
+
+5.	CategoryComparisons:
+
+		TempX --> CateogryComparisons --> ticker.csv (date, all variables relative to each category (difference percent)) -- for change pct, initial is category.  final is stock value.
+		
+		for each category
+			for each stock in category
+				build/add-to category averages for each variable
+				
+so, X exists within a stock.
+
+lets make one that exists w/in something else.... instead of "ticker" in the ticker attribute, it will be .... categoryFullName.  the dates will align with Season's dates (so there will be no hps!) hmmm
+
+for each stock
+	for each X
+		supplement the CategoryX with stock's X
+
+
+note:  there will be no uploading data and then copying it in to some matrix or arrays or lists for computation.  data will be processed in same format as it's uploaded. 
+----------- would fileIO be faster if data was stored on its side?  a data array per line?  (all the dates on one line, vs. 1 date per line)? yes i think so, but it would be harded to read.  so lets not do that
+			--- as you read a file, put values in lists, then convert lists to arrays for processing
+			
+
+so, we will upload data in to a list of stocks.  each stock will house a number of objectXs.  each objectX will contain an array where each element corresponds to a different date
+relative to the dates in the original yahoo daily prices file. 
+
+after compiling all the data, is there any point to writing it to disk in one single location?? ... i don't really think so.  but idk.  idk how much slower it is to open a file vs. reading from one file
+....... there will certainly be quite a few files this way.  probably best to be able to save to one spot.  
+
+so will need to be able to read from fragmented files OR from one unified file.  
+
+squisher will do NO CALCULATION!  is that a good idea?  this is kind of the opposite of the previous iteration -- it had been doing everything in memory.  fuck.  idk.  well, one question is 
+what is the time cost to splitting data into multiple files vs. same file.  lets figure that out now.
+
+
+
+
+
+
+
+
+
+how to do the thing where, before an earnings, i look at other companies who had earnings in that company's <category>, and say "90% of them rose after earnings" or "their average price change after earnings
+was +13%" ???
+
+variable:  category_ave_price_change_following_recent_current_quarter_earnings_release
+
+how to calculate this?  for sectors/industrys:
+
+set: SHRINKING: set of all companies in this category.  companies to be removed once their earnings are released in current release season ( = same as following quarter). note:  this is inaccurate for companies who don't follow the calendar quarters.  whatever
+set: companies: set of all companies in this category
+set: EARNINGSSET: set of all earnings info that have been released so far in this earnings season.  starts empty
+
+for each business day NOW:
+	for each DAY from  NOW to first date of current earnings season (correction: i think this should be: from each day from start of earnings season to end of earnings season)
+		for each STOCK in SHRINKING
+			if STOCK released EARNINGS on this DAY, then:
+				add EARNINGS to EARNINGSSET
+				remove STOCK from SHRINKING
+		calculate average price change for earnings in EARNINGSSET (and calculate other stuff? sd? pct>3%?) -- write this to disk
+		
+make a file for each category's previous_ave_price_change_following_recent_earnings.  4 files plus n files (n = # of stocks, since each stock has unique category set for google related companies)
+
+build these files after filling earnings objects with price changes.  right after downloading everything.
+
+should we add new folder, along with "downloads" called "cooks"
+
+cooks:
+CategoryEarningsBehavior (date, priceChangePct, pct>0%, pct>2, pct>4)
+
+no, just add this as a new object.  give it internal X class to do this work.  build this file on the disk like the other objects.  
+
+
+
+use "_" at end of class name to denote that it contains arrays rather than discrete data points?
+
+X_ is a subclass that will contain arrays of data for final study.  the class will contain a list of varObjects that will point to one of its arrays and be used for building its data and writing to megafile
+
+regarding accessing variable name/key through this.getclass stuff ...  constructing new empty class every time i want to access key for map
+//slightly slower like this? having to construct an object every time i access name.  worth it for robustness?
+		//and this way would be so awesome if i ever wanted to change a variable name!!!!!!!!!!!!!!!!!!!!!
+		//ITS NOT SLOWER!!!! yESSSSSSSSSSS!
+		
+for accessing data in an xObject's vars map, ema3.class is shorthand for (new ema3()).key()
+
+no.  we're removing empty constructors -- those were just used to get key.  remove .key().  just remember to use asdfasdf.class as the key.  class is key.
+
+get rid of internal class V (inside X_), but make sure all non-variable methods are private (so it's easy to access variable names elsewhere)
+
+should we start all non-variable method names w/ underscore?  for maximum clarity?
+
+X_ contains NO ATTRIBUTE ARRAYS.  only the Var map and any helper objects it needs
+
+fuck but what about other xObjects that will need other input data .... 
+
+as a consequence of packaging variable classes into a V subclass, we can never construct an empty var class.  null will make errors -- not going to add lots of "if not null..." 
+
+but there should be no need to ever do that... remember, key is coming from ema3.class, or 
+
+why underscore after X?  why X_??  that's stupid.  drop that.
+
+V shit is too much headache.  drop it.  netbeans won't offer to make new methods if i type them w/in ema3 ( in the right spot)
+
+  //TODO start here -- we need to pass an X obect to the constructors so they have access to X's data! direct access.  NO THATS NOT TRUE!!!  X vars' constructors already have access to X components!  
+	//passing "this" would be redundant and stupid and cluttery.  totally no point.
+	
+//	   int [] date = pricesX.hps.date;	    //idea was to have class convenience vars like this, but that would defeat the point of having one cetrally named var.  to avoid changing a bunch of crap when i want to change variable names
+//	   float [] close = pricesX.hps.close;
+
+when making new X methods, start with constructors that accept a minimum of parameters.  later we can pare back functionality into pre-packaged parameters
+
+
+march 17
+
+-- i think the framework is complete.  for reading/writing.  way to hold data.  list of classes.  now update previously written X's, and then do the two more.  more complicated one
+
+TODO now - initializing era-based Xobjects from files.  xfiles and erafiles.  how to do this?  it's about to get junky!!!  clean up
+
+how?  create a 2nd generation of inheritance??  use multiple different interfaces?  
+
+okay.... framework is being built to support individual X behavior.  building object data from files (later from objects -- just make simplified constructors) and writing to xfiles (vars and eras files)
+		what about IO from megafile? megafiles?  what how long does it take to read 6000 characters from the same file vs. 6000 diff files????????????? lets test that now.
+				THEN - deal with era interface
+		file study result!!! it takes about 1 extra second to read data from (split up in) 10,000 different files versus from one file
+		
+X() checklist:
+
+1.  build vars map from files
+2.  read  vars map from xfile
+3.  build eras from files
+4.  read  eras from xfiles
+5.  write vars to disk
+6.  write eras to disk
+
+later: something will use a list of all the X's to build a supermap of all contained Vars & use that to read/write megafile
+
+
+1 & 3  asdf = new X(String ticker)		//read everything from raw scratch
+
+2 & 4.  asdf = new X(String ticker, boolean fromXfiles)		//bool ignored - just directs to proper constructor
+5 & 6.  asdf.writeToDisk() 
+
+remember - var classes must be static!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+put eraDataRow INSIDE X()'s.  they are used exclusively for X's
+
+
+each X should have 3 constructors.  
+
+one w/ ticker only -- gets everything from download files
+one w/ objects only -- uses data in objects.  one probably must be historicalPrices hps
+one w/ ticker and boolean - get everything from xfiles
+
+each X may have different attributes depending on what is needed for its vars
+
+
+
+
+netbeans bug: comments (taht are on the line above the for-loop) get deleted when automatically converting from for-loop to for (Iterator...) {} 
+
+orphan comments from secwrapper x  //this could read HP directly, but i think this will be clearer, if X's only construct using other X's.  make other convenience constructors for other parameteres
+
+
+
+right now - each var has arrays that are all the same length, per stock.  is that wasteful?  should some vars be shortened?  like things that are relevant to only recent data? like... wait no i don't think anything like that actually exists.  it's fine/good for all vars arrays to be same length!
+
+if i ever must use var.calculateData for any more input-dependent parameters than hps ........... fuck should i even pass in X to calculateData ????
+
+old comments from SuperX:
+
+    /** this should be an X's attributes!  not in SuperX!  cos we want to use SuperX for CategoryX's!!!  need different date standards */
+//    public HistoricalPrices hps;	//why is there so much redundant data? hps AND ticker AND date AND close?  i'm pretty sure there was a good reason, just can't remember
+
+
+    //crap... should these things just be accessed from hps??  maybe this is getting cluttered/confusing/junky having all these loose variables
+    //will we ever need to use this stuff if we're not building hps?  that is, if accessing from xfile?  NO!  cos wno't need to do any calcualtion!
+    //	    unless we're getting category averages, then the Stock will need to make it's own map, that all the X's can share.
+    //TODO start here!
+    //i just removed a bunch of global SuperX vars -- must access through hps!  seems cleaner, more manageable.
+    //next -- keep working on category stuff.  
+	
+
+TODO -- idk!  i finished what i hoped to finish in a week kind of .  haven't tested.  now it:
+
+ohhhhhhhh wait i want Stock.write .... done!   okay now just test!!!!!!!!!  and then ... write the filter/screening system?  write megafile download/upload system?
+
+
+NEW THINGS
+
+1.  catave - actually calculate the stock vars' comparisons w/ cat aves!   -- put this in a float array inside Var
+2.  new Var attribute:  bool isCatAve.  later, in CatAve-->Stock class, make a list of only catAve vars.  only calculate catAves for these, and only calculate catAvComparisons for these!
+
+NO NO NO NO NO -- dont do this!  we are NOT accessing eras stuff for each date index!!!! we are screening eras FIRST!  a whole era at a time!  and taking subset of passing dates to use for daily Vars analysis. 3.  make new eraIndex Var for each X that contains eras.  point to this Var's class with static attribute in T_EraDataRow.  this will be used during screening.
+4.  make T_EraDataRow variables accessible somehow.  put them in a map?
+4.  in Stock, make Map<Class (T_EraDataRow's class), List<T_EraDataRow>> - to use during screening.  map of ALL eraDataRows lists.
+4.  make all catAvable vars use float array.  then only access float array during cat ave calculations.
+
+filtering!
+5. make class Condition w/ subclass Subcondition.  Subcondition might contain a custom Operator class (to handle <=, >=, and == (for booleans)).  subcondition will know which type array to access when it is created
+it's okay to keep having Var's with several possible data types.  just make sure that we already know which one to work with for every computation-intensive task.  don't be checking datatype per variable access. 
+
+for eras -- DON'T put a set of dates w/in each era and DON"T use set intersectiosn (via retainAll(...)) to shrink the set of valid dates to screen Vars on.  INSTEAD, just use an era's mindate and maxdate via containsDate(...).  and do date removal via iteration over original dates set (that has already been shrunk based on macro data (weather))
+
+use linkedhashset when i need frequent adding/removing (like dates set for final screening!)  http://4.bp.blogspot.com/-cNSGutQiqVw/UEFtS7SlHqI/AAAAAAAAAGI/0fSiC6Ok718/s1600/SetPerf.png http://java.dzone.com/articles/java-collection-performance
+
+linked lists make modification easier because the change to the structure is local to that element.  doenst have to change the whole thing
+
+catAve -- i don't want to have to calculate catAveComparisons for EVERY cat class EVERY time!!!!!!  sectors might turn out to be useless!  how to be flexible re: which cat classes to use?
+
+1.  variable PER Var?
+2.  variable per screen?
+
+if we do 1, then we can implement 2 easily!
+
+the Condition or Subcondition will load the appropriate data array.  so it doesn't have to search for it repeatedly.  only searches for it once per stock.
+
+... should we merge all the stocks data into one megastock to avoid re-fetching data arrays?  that would make eras complicated... it would require daily era checking via extra eraIndex vars.  couldnt do the day set [effectively] intersections stuff that we're planning for now. 
+
+
+DON'T USE boolean!!!!!!!!!!!!!!!!!!!!  use bytes instead.  both use 1 byte of data.  for eradatarows, reflection, asdf.getFloat(obj) works for int, byte, char, short, and float.  not double and NOT BOOLEAN!
+
+currently, X objects refer to hps, in prices_X  -- REMOVE THIS!! dont do this anymore!  other X objects should refer to prices_X which accounts for current prices! hps is short by 1 day!
+
+TODO - consider removing some of the is_null checks during repetitive calculations of clean data
+
+TODO - throw and catch this stuff during data calculation, array handling!!!!!! 	    } catch (G.My_null_exception ex) {
+	
+	
+	what am i doing right now ......... being mad at emily
+	
+	also making only calculate_data_origination(...) available for X creation.  don't create from raw files.  we need prices_X Vars.  arrays with extra cell to put current prices in later.  don't use hps anywhere anymore!  except in prices_X
+	
+	also making sure calculations are handling G.isnull stuff okay
+	
+TODO - walk through calculations and make sure it handles single-day processing AND handles custom nulls
+
+later - how to handle xfiles???  read in data, then go through all vars and push an empty cell at beginning of all data arrays.  with custom null.  then read in current prices.  
+
+WHAT ABOUT AVERAGING / EARNINGS RESPONSE ::: current prices????????????????????????????????????????????
+
+next TODO - tie downloaders to X objects!  X's are like an object's use interface.  
+
+WHAT BUILDS CATAVES??????????
+
+we need this:
+
+Map<C.CategoryType, Map<String, CatAves>> catType__name_catAves__map
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+TODO -- clean up downloaders a bit more.  
+	
+	
+	estimize earnings calendar - wtf after running once, it just runs a tiny bit.  look in to file downloading decisions stuff.  like when it knows when it's time to download again?
+	
+	things should keep downloading data until there is a full set in the archive.  how to tell if enough stuff has been downloaded?
+	
+	
+	
+	news downloader:  have TWO SEPARATE PROGRAMS
+	
+	1.  download news info WITHOUT GOING TO ARTICLE TO GET PUBTIME!
+			get pubtime from yahoo/google main news page if listed.  
+			also record news url
+			record two booleans:  openArticleToScrapePubtimeLater -- true for articles that don't have pubtime.  and openArticleToScrapePubDateLater - for google subarticles that don't say the correct date. 
+			
+	2.  read news info from disk -- get time &/or date for listed articles depending those two bools!
+
+ public CatAves(String categoryFullName, Set<Stock> stocksInTheCategory)
+ 
+ how do i get stocksInTheCategory?????????????/
+ 
+ set of stocks per category full name
+ 
+ like this!
+ Map<String, Profile_EraDataRow> profiles = Profile_EraDataRow.readAllFromDisk();
+	this.ticker_earnings__map = Earnings_EraDataRow.readAllFromDisk();
+	this.categoryFullName_tickers__map = C.getMap__categoryFullName_tickers(profiles);
+	
+	when reading filter file, the word after the var name might be the C.CategoryType!!!!!!! that means it's a catAveComparison request
+	
+	TODO -- clean up downloaders a bit more.  
+	
+should each Var contain pointers to its category's earnings responses?????
+
+why does AA's google industry average for finance stuff not show AA's leftmost data?  is that the extra value for today?  is today's value not going in to category average values?? why not? should it???/
+
+
+TODO -- in filter, how to query CER for specific category?????   -- include category types in filter??? now, that variable is set in C, i think.  
+ - for readability, use category type nicknames in filter
+ 
+ todo -- ready to start testing filter screener i think!

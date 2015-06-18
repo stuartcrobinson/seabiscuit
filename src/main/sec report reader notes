@@ -1,0 +1,70 @@
+
+target stocks with:
+
+high institutional ownership.
+
+operating earnings per share?
+adjusted earnings per share?
+
+determine precise quantity names, like "fourth-quarter 2014 operating earnings per share"
+
+
+back-check accuracy of zach's ESP http://www.zacks.com/earnings/earnings-surprise-predictions/
+
+
+twitter so confusing.  estimated EPS: -0.20.  actual EPS: -0.15   but i can't find "-0.15" anywhere in twitter's report :( wtf
+
+gaap-eps vs non-gaap eps :(  ?
+
+https://investor.twitterinc.com/secfiling.cfm?filingID=1564590-15-513&CIK=1418091
+
+https://investor.twitterinc.com/releasedetail.cfm?ReleaseID=894844
+"Q4 GAAP EPS of ($0.20) and non-GAAP EPS of $0.12"
+
+http://www.morningstar.com/earnings/earnings-calendar.aspx
+TWITTER INC  TWTR 	After Market Close	N/A	-0.21	-0.15
+
+
+http://www.inc.com/associated-press/twitter-reports-4th-quarter-loss.html
+Excluding one-time items,Twitter earned $79.3 million, or 12 cents per share -; double the 6 cents expected by analysts, according to FactSet.
+Revenue surged to $479.1 million from $242.7 million, also topping analysts' average estimate of $453.8 million. 
+
+http://www.valuewalk.com/2015/02/gopro-twitter-earnings-preview/
+Analysts polled by Thomson Reuters expect Twitter to report 6 cents in EPS and $453.1 million in revenue. 
+The company had earned 2 cents on revenue of $242.68 million in the corresponding quarter a year ago. 
+Investors have been calling for the ouster of Twitter CEO Dick Costolo. Under pressure, he has rolled out a lot of new features.
+Many of the new features came in the current quarter, so their impact may not reflect in the Q4 results.
+
+http://www.benzinga.com/analyst-ratings/analyst-color/15/02/5200433/cantor-fitzgerald-previews-twitters-q4-expects-solid-res
+Squali expects Twitter to report revenue of $463.3 million, slightly above the consensus estimate of $454.0 million and 
+ above management's guidance of $440 million to $450 million.
+
+http://marketrealist.com/2015/02/get-ready-twitters-possibly-better-expected-4q-earnings/
+Wall Street’s estimates for Twitter’s 4Q14 revenues
+According Wall Street analysts’ consensus estimates, TWTR will report fourth-quarter earnings of 6 cents per share on $453 million in revenue,
+ compared with 2 cents per share on $243 million in Q4 2013.
+For the full year, analysts believe Twitter will report $1.38 billion in revenue compared with $665 million in revenue in 2013.
+That’s almost a 107% increase in revenue.
+
+I FIGURED IT OUT! - stuart - some stuff says ... "expected 6 cents compared to 2 cents last year" so i checked last years - 
+they are using the non-gaap eps
+http://files.shareholder.com/downloads/AMDA-2F526X/3946699914x0x723501/63126BA5-3C0F-4FF2-BD09-E38CF7170566/Q4_13_Earnings_Press_Release.pdf
+Q4 GAAP EPS of ($1.41) and non-GAAP EPS of $0.02
+
+
+
+FACEBOOK -- earnings previews also highlight estimates as compared to what metrics in previous report:
+http://investor.fb.com/releasedetail.cfm?ReleaseID=893395
+
+http://www.valuewalk.com/2015/01/microsoft-apple-facebook-earnings-preview/
+ The company is expected to post earnings of $0.33 per share, up from $0.20 per share the same quarter last year. 
+Analysts also expect the company to post revenue of $3.78 billion, marking a 46% increase on a year-over-year basis.
+
+stuart - note - eps was .25 instead of .3.  it looks like the stock fell about 0.7% in the morning, but then was back up by evening.
+profiting from earnings disappointments may be too risky
+
+
+write program that grab's zack's ESP numbers for stocks right before they release reports.  
+go ahead and set up VPS!
+
+download more zacks data -- esp, other?

@@ -1,0 +1,5 @@
+package supers;
+
+interface EraInterface {
+
+}

@@ -1,0 +1,2053 @@
+
+	    //now calculate technical stuff! :)
+	    /* add:
+	    
+ OUTPUT:
+ volChangeDay - vol change - day
+ rvolChangeDay - vol change - day
+ rOBV_1DayChPct
+ rOBV_2DayChPct
+ rOBV_3DayChPct
+ RSI_14
+ RSI_3
+ rvwRSI_14
+ rvwRSI_3
+ rPriceChangePct
+ nDaysDownConsecutivePast
+ nDaysUpConsecutivePast
+ rRMPC_100 -- relative magnitude of price change -- the percentage of days' price changes over the past X days which are less than today's change.
+ HV_100 - stnd dev of the continuously compounded returns.  CCR = ln(price_today/price_yesterday)
+ HV_100_intraDayMax
+ CCR_intraDayMax
+	    
+ MoneyFlowMultiplier
+ MoneyFlowVolume
+ ADL
+ ADL_EMA3
+ ADL_EMA10
+ Chaikin
+	    
+ http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:chaikin_oscillator
+ 1. Money Flow Multiplier = [(Close  -  Low) - (High - Close)] /(High - Low) 
+ 2. Money Flow Volume = Money Flow Multiplier x Volume for the Period
+ 3. ADL = Previous ADL + Current Period's Money Flow Volume
+ 4. Chaikin Oscillator = (3-day EMA of ADL)  -  (10-day EMA of ADL)	
+	    
+ TO DATA ONLY:
+ rOBV
+ AG_14 -- ave gain -- for RS for RSI
+ AL_14 -- ave loss
+ AG_3
+ AL_3
+ rvwAG_14 -- ave gain -- for RS for RSI
+ rvwAL_14 -- ave loss
+ rvwAG_3
+ rvwAL_3
+ CCR
+	    
+ obv:
+ If the closing price is above the prior close price then: 
+ Current rOBV = Previous rOBV + Current Volume
+
+ If the closing price is below the prior close price then: 
+ Current rOBV = Previous rOBV  -  Current Volume
+	    
+
+keep this forever:  how to download file from webdriver into specific folder w/ no popup:
+package stuff;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
+
+public class Download_MorningStar_Fundamentals {
+    
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+	
+	System.out.println("hey");
+
+	String location = "C:\\Program Files (x86)\\Java My Libraries\\Selenium\\chromedriver.exe";
+	System.setProperty("webdriver.chrome.driver", location);
+//	HtmlUnitDriver driver = new HtmlUnitDriver();
+//	FirefoxDriver driver = new FirefoxDriver();
+	//ChromeDriver
+//	WebDriver driver = new HtmlUnitDriver();
+//	WebDriver driver = new ChromeDriver();
+	String downloadFilepath = "C:\\Users\\User\\Documents\\stocks\\data\\newStuffNov2014\\MorningStar Downloads 20141118";
+	HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
+	chromePrefs.put("profile.default_content_settings.popups", 0);
+	chromePrefs.put("download.default_directory", downloadFilepath);
+	ChromeOptions options = new ChromeOptions();
+	HashMap<String, Object> chromeOptionsMap = new HashMap<String, Object>();
+	options.setExperimentalOptions("prefs", chromePrefs);
+	options.addArguments("--test-type");
+	DesiredCapabilities cap = DesiredCapabilities.chrome();
+	cap.setCapability(ChromeOptions.CAPABILITY, chromeOptionsMap);
+	cap.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+	cap.setCapability(ChromeOptions.CAPABILITY, options);
+	WebDriver driver = new ChromeDriver(cap);
+
+	//1.   get list of all stock names in data folder
+	//2.   go to url for that stock for each US exchange
+	
+	String urlBase1 = "http://financials.morningstar.com/ajax/exportKR2CSV.html?&callback=?&t=XNAS:";
+	String urlBase2 = "http://financials.morningstar.com/ajax/exportKR2CSV.html?&callback=?&t=XNYS:";
+	String urlBase3 = "http://financials.morningstar.com/ajax/exportKR2CSV.html?&callback=?&t=XASE:";
+	
+	
+	
+	
+	File[] listOfStockFiles = new File(downloadFilepath).listFiles();
+	List<String> preloadedsymbols = new ArrayList<>();
+	for (File preloadedfile : listOfStockFiles) {
+	    preloadedsymbols.add(preloadedfile.getName().replace(" Key Ratios.csv", "").replace(".csv", "").trim());
+	}
+	//C:\Users\User\Documents\stocks\symbols_20141118.txt
+	
+//	File symbolsFile = new File("C:\\Users\\User\\Documents\\stocks\\symbols_20141118.txt");
+	String dirStr = "C:\\Users\\User\\Documents\\stocks\\data\\daily_20141118\\";
+	File folder = new File(dirStr);
+	File[] listOfFiles = folder.listFiles();
+
+	for (File file : listOfFiles) {
+	    String ticker = file.getName().replaceAll(" ", "").replace("_raw.csv", "");
+	    if (!file.getName().contains("_all_stocks") && !preloadedsymbols.contains(ticker)) {
+		System.out.println(ticker);
+
+		driver.get(urlBase1 + ticker);
+		driver.get(urlBase2 + ticker);
+		driver.get(urlBase3 + ticker);
+	    }
+	}
+
+	driver.close();
+	
+    }
+
+}
+
+
+
+usage:
+
+1.  manually download USA tickers list from http://finviz.com/screener.ashx?v=152&c=1  // some of these might not be NYSE/NASDAQ/AMEX
+2.  downloader.java to download daily prices from yahoo
+2a. MktCompChangeMaker to calculate mkt-wide composite changes per day (use to normalize individual stock shifts later)
+3.  MorningStar.java to get financial data
+4.  MorningStarReformat.java to put MS data in a table, readable
+5.  DataStitcher -- combine datas per stock.
+6.  Analyzer -- (in progress) ... play with data ... get correlations table? run linear regressions?  test strategies?  
+
+
+
+
+
+			/* add:
+			
+			 OUTPUT:
+			 x rOBV_1DayChPct
+			 x rOBV_2DayChPct
+			 x rOBV_3DayChPct
+			 x RSI_14
+			 x RSI_3
+			 x rRSI_14
+			 x rRSI_3
+			 x rRMPC_100 -- relative magnitude of price change -- the percentage of days' price changes over the past X days which are less than today's change.
+			 x HV_100 - stnd dev of the continuously compounded returns.  CCR = ln(price_today/price_yesterday)
+			
+			 x volChangeDay - vol change - day
+			 x rvolChangeDay - vol change - day
+			
+			 x nDaysDownConsecutivePast	    - double relative
+			 x nDaysUpConsecutivePast	    - double relative
+			
+			 x MoneyFlowMultiplier
+			 x MoneyFlowVolume
+			 x ADL
+			 x ADL_EMA3
+			 x ADL_EMA10
+			 x Chaikin
+			
+			 http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:chaikin_oscillator
+			 x 1. Money Flow Multiplier = [(Close  -  Low) - (High - Close)] /(High - Low)
+			 x 2. Money Flow Volume = Money Flow Multiplier x Volume for the Period
+			 x 3. ADL = Previous ADL + Current Period's Money Flow Volume  (running total of MFV)
+			 x  4. Chaikin Oscillator = (3-day EMA of ADL)  -  (10-day EMA of ADL)
+			
+			 TO DATA ONLY:
+			 x rOBV
+			 x AG_14 -- ave gain -- for RS for RSI
+			 x AL_14 -- ave loss
+			 x AG_3
+			 x AL_3
+			 x rAG_14 -- ave gain -- for RS for RSI
+			 x rAL_14 -- ave loss
+			 x rAG_3
+			 x rAL_3
+			 x CCR
+			
+			 obv:
+			 If the closing price is above the prior close price then:
+			 Current rOBV = Previous rOBV + Current Volume
+			
+			 If the closing price is below the prior close price then:
+			 Current rOBV = Previous rOBV  -  Current Volume
+			
+			 */
+
+
+			//
+//		data[i][I.rPriceChangePct] = data[i][I.priceChangePct_day] - data[i][I.mktAve_PriceChangePct];
+
+
+
+
+    public static double string_to_num(String chars) {
+
+	Map<String, Integer> cn = new HashMap<>();
+	cn.put("A", 11);
+	cn.put("B", 12);
+	cn.put("C", 13);
+	cn.put("D", 14);
+	cn.put("E", 15);
+	cn.put("F", 16);
+	cn.put("G", 17);
+	cn.put("H", 18);
+	cn.put("I", 19);
+	cn.put("J", 20);
+	cn.put("K", 21);
+	cn.put("L", 22);
+	cn.put("M", 23);
+	cn.put("N", 24);
+	cn.put("O", 25);
+	cn.put("P", 26);
+	cn.put("Q", 27);
+	cn.put("R", 28);
+	cn.put("S", 29);
+	cn.put("T", 30);
+	cn.put("U", 31);
+	cn.put("V", 32);
+	cn.put("W", 33);
+	cn.put("X", 34);
+	cn.put("Y", 35);
+	cn.put("Z", 36);
+
+
+	String resultSt = "";
+
+	for (int i = 0; i < chars.length(); i++) {
+	    String letter = chars.substring(i, i + 1);
+	    resultSt = resultSt + cn.get(letter);
+	}
+	return Double.parseDouble(resultSt) * 1.0;
+
+    }
+
+    public static String num_to_string(Double num) {
+
+	Map<String, String> nc = new HashMap<>();
+	nc.put("11", "A");
+	nc.put("12", "B");
+	nc.put("13", "C");
+	nc.put("14", "D");
+	nc.put("15", "E");
+	nc.put("16", "F");
+	nc.put("17", "G");
+	nc.put("18", "H");
+	nc.put("19", "I");
+	nc.put("20", "J");
+	nc.put("21", "K");
+	nc.put("22", "L");
+	nc.put("23", "M");
+	nc.put("24", "N");
+	nc.put("25", "O");
+	nc.put("26", "P");
+	nc.put("27", "Q");
+	nc.put("28", "R");
+	nc.put("29", "S");
+	nc.put("30", "T");
+	nc.put("31", "U");
+	nc.put("32", "V");
+	nc.put("33", "W");
+	nc.put("34", "X");
+	nc.put("35", "Y");
+	nc.put("36", "Z");
+
+
+	String numSt = String.format("%.0f", num);
+//	System.out.println(numSt);
+
+	String result = "";
+
+	for (int i = 0; i < numSt.length(); i = i + 2) {
+//	    System.out.println(numSt.substring(i, i + 2));
+//	    System.out.println(nc.get(numSt.substring(i, i + 2)));
+	    result = result + nc.get(numSt.substring(i, i + 2));
+	}
+
+	return result;
+    }
+
+
+todo
+
+write java program that simulates buying/selling pattern
+
+filter 1 - find stocks per day 
+**RANK** stocks per day - to just pick the top 4 or something.  
+
+
+real estate?  find historical data on real estate prices.  look at geographical trends.  
+
+** stock correlations study --  correlate each stock week's change with every other stock's next-week-change (pct).  
+also include:
+commodities, weather (rain? hail?)
+mrci.com !!! commodities daily back several years -- lots of scraping required!  but nice tables, multiple futures per date page
+quandl.com/c/markets/commodities -- exportable csvs going back years!!!
+investing.com/commodities/us-wheat-historical-data -- good online tables, but can't export
+
+
+http://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=GOOG&type=10-Q&count=100  !!
+
+http://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=GOOG&type=10-Q&count=100&output=xml
+
+http://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=GOOG&type=10-Q&count=100&output=atom  !!!!!
+
+      <updated>2004-08-16T16:41:15-04:00</updated>
+
+go to page, search for 10-q (and 10-k)
+search text for <updated> ...  just take the necessary substring to get date.  if "TI" - add a day (released in afternoon).  if "T0" - do nothing to date
+
+store all dates in text file....
+
+ticker,dates
+goog,20040314;200400613;20050303
+msft,20040324;200400616;20050303
+etc
+
+
+
+//TODO get optionable!  http://www.cboe.com/publish/ScheduledTask/MktData/cboesymboldir2.csv
+
+
+//
+//http://www.cboe.com/tradtool/symbols/SymbolAll.aspx
+//TODO format numbers!! too many decimals places!
+
+//TODO CHANGE PERCENTS ARE WRONG!!! MISSING *100!!!!!
+
+//TODO get optionable!  http://www.cboe.com/publish/ScheduledTask/MktData/cboesymboldir2.csv
+//http://www.optionistics.com/quotes/option-prices?optsym=QQQ%20%20%20141122C00104000 -- historical
+
+11 AM dec 3 2014 -- right now i'm running Averages lt0 and gt1 on data that is filtered like the best mysql screen i've made:
+volume > 65000 && close > 0 && year > 2004
+					    && numDaysSinceSecReport > 5
+					    && numDaysUntilSecReport > 30
+					    && EMA_3m5 < .05
+					    && EMA_3m9 < .1
+					    && EMA_3m20 < .2
+					    && EMA_3m50 < .3
+					    && EMA_3m200 < .5
+					    && AG_3 < .4
+					    && PB < 10
+					    && PEG < 2
+					    && PC < 180
+					    && CCR < 0.1
+					    && priceChangePct_month < -5
+					    && priceChangePct_3months < -7) {	
+
+actually i should have made volume > 100000 like mysql but oh well.  i am looking to study the situations that pass this filter but still tank.
+hopefully we can avoid those.
+
+why? numDaysSinceSecReport > 5 -- i guess it takes a week for ppl to adjust their positions based on the report.  
+.... so ... would that mean behavior on day of report will continue for the next few days??? ...
+
+now:  squishing in to squished_smaller_noPB.
+
+subset this file, check it for latest screens in mysql output file.
+
+
+length of CEO position:  use this data - see if co w/ longer-running CEO do better than others
+
+//http://www.dailyfinance.com/quote/NYSE/boise-cascade-co/BCC/key-executives?source=itxwebtxt0000004
+
+//use yahoo (http://www.financialwisdomforum.org/gummy-stuff/Yahoo-data.htm also downloaded in newstuff folder) to get co prices right before close, for purchases
+
+todo - get news release dates per co - new filter metric?  (how recently news released)
+
+1.  yahoo prices getter + stock filter! 
+
+todo -- convert news and CEO java files to make new file per stock.  so it's easy to pick up where left off
+-- install hotspot shield
+-- use to finish getting ceo and news data
+-- upgrade stitch.java
+
+
+historical ownership??? http://www.gurufocus.com/ShortInterest/AAPL
+-- monthy historical inst and other stuff
+-- java to move cursor across chart and read changing html for montly data
+
+
+short interest:  http://www.nasdaq.com/symbol/aapl/short-interest
+
+current data has really fucked up numbers. i think cos i used zack's stock screener to get stocks.
+
+get new data.  start over.  rewrite all downloaders so they use the symbols list, not the prices folder.  
+
+BUT FIRST -- update stitcher!  use only files in symbols.csv.   add new vars!
+
+TODO -- rerun all stitchedPart1 before shower
+
+IMPORTANT:  stitched files must have biggest dates at the top
+
+todo:  rerun stitched parts 2 and 3
+
+then... make_subset and play with vars in mysql
+
+note - important:  all calculated ratios are multiplied by 100 -- so they are in unit percents.  
+i'm going to remove the "_pct" tag from all variables.  
+
+
+put this back in mktCompsites
+
+	FileWriter fw = new FileWriter(outFile);
+	try (BufferedWriter bw = new BufferedWriter(fw)) {
+	    bw.write(""
+		    + "date,"
+		    + "priceChangePct_day,"
+		    + "priceChangePct_week,"
+		    + "priceChangePct_month,"
+		    + "priceChangePct_3months,"
+		    + "priceChangePct_6months,"
+		    + "priceChangePct_year,"
+		    + "vwPriceChangePct_day,"
+		    + "vwPriceChangePct_week,"
+		    + "vwPriceChangePct_month,"
+		    + "vwPriceChangePct_3months,"
+		    + "vwPriceChangePct_6months,"
+		    + "vwPriceChangePct_year,"
+		    + "vChwPriceChangePct_day,"
+		    + "intraDayPriceChangePct,"
+		    + "vwIntraDayPriceChangePct,"
+		    + "nextDay_openVPrevCloseChangePct,"
+		    + "vwNextDay_openVPrevCloseChangePct,"
+		    + "H_m_L_o_L_pct,"
+		    + "vwH_m_L_o_L_pct,"
+		    + "VolumeChangePct_day,"
+		    + "MoneyChangePct_day,"
+		    + "Volume,"
+		    + "Money,"
+		    + "\n");
+
+
+IS THIS STUPID?  am i wasting time basically writing my own database software instead of just using msql???
+how do i know when to use mysql and when data files?
+
+try to do stitched_part3 -- 3 vars at a time.  
+
+TODO start here:  put new subset in to mysql and try stuff out!
+
+
+select count(*),count( DISTINCT(date) ),avg(futChange_weekPct), (count( DISTINCT(date) ) * avg(futChange_weekPct)),  SUM(if(futChange_weekPct > 0, 1, 0))/count(*) AS "pct win"
+from 2013_and_2014_mod5_sub1 where 
+#year = 2014 and
+cap < 1000000000 and 
+ceo_age_1 > 30 and 
+ceo_age_2 > 30 and 
+ceo_age_aveAll > 30 and 
+ceo_duration_1 > 2 and 
+news_daysSince > 0 and 
+#news_bad_daysSince > 0 and 					#great but restrictive -- use these 3 to filter per day!
+#noaa_ny_tmax < 90 and							#great but restrictive
+#shortInterest_nDaysSinceLast > 0 and 			#great but restrictive
+numDaysUntilSecReport > 40 and
+#EMA_3m5 < .05 and		#remove?
+#EMA_3m9 < .2 and		#remove?
+#EMA_3m20 < .2 and		#remove?
+#EMA_3m50 < .3 and		#remove?
+#EMA_3m200 < .2 and		#remove?
+#iy_dPt_PE < .8 and
+MS_Financials_EarningsPerShare > -10 and 
+AG_3 < .3 and
+#PEG < 5 and PEG > -3 and
+#PC > -10 and PC < 280 and 
+#CCR < 9 and
+rPriceChangePct_prevDay1 < 1 and 		#remove?
+priceChangePct_day < 5 and 				#remove?
+priceChangePct_week < 10 and 
+priceChangePct_month < 5 and	#priceChangePct_month > -3 and 					## %er 
+priceChangePct_3months < -10 and
+volume > 100000 and
+true; 
+
+#notes:  smaller-caps stocked had higher pct gain, but not enough to raise $
+# developed this screen on 2013_and_2014_mod5_sub1_mod3_sub1
+# then tested on 2013_and_2014_mod5_sub1  - basically same results.   --- although those sets share data, so that is expected.  
+# loading unique subset now:  2013_and_2014_mod5_sub2 .......... also success.  
+
+#news_bad_daysSince seems very effective!  but very restrictive.   same but less for noaa_ny_tmax < 90 and. and shortInterest_nDaysSinceLast > 0 and 
+
+
+
+
+
+
+
+
+
+
+
+----------------------------
+select count(*),count( DISTINCT(date) ),avg(futChange_weekPct), (count( DISTINCT(date) ) * avg(futChange_weekPct)),  SUM(if(futChange_weekPct > 0, 1, 0))/count(*) AS "pct win"
+from from_1995_mod100_sub2 where 
+#year = 2014 and
+##cap < 1000000000 and 
+##ceo_age_1 > 30 and 
+##ceo_age_2 > 30 and 
+##ceo_age_aveAll > 30 and 
+##ceo_duration_1 > 2 and 
+#news_daysSince > 0 and 
+#news_bad_daysSince > 0 and 					#great but restrictive
+#noaa_ny_tmax < 90 and							#great but restrictive
+#shortInterest_nDaysSinceLast > 0 and 			#great but restrictive		#2014 only
+numDaysUntilSecReport > 40 and
+MS_Financials_EarningsPerShare > -10 and 
+AG_3 < .3 and
+#iy_dPt_PE < 1 and
+#*PE > -3 and  PE < 10 and 
+#PEG < 5 and PEG > -3 and
+#PC > -10 and PC < 280 and 
+#CCR < 1 and
+rPriceChangePct_prevDay1 < 1 and 		#remove?
+priceChangePct_day < 5 and 				#remove?
+priceChangePct_week < 5 and 
+priceChangePct_month < 5 and	#priceChangePct_month > -3 and 					## %er 
+priceChangePct_3months < -10 and
+volume > 100000 and
+true; 
+
+#notes:  smaller-caps stocked had higher pct gain, but not enough to raise $
+# developed this screen on 2013_and_2014_mod5_sub1_mod3_sub1
+# then tested on 2013_and_2014_mod5_sub1  - basically same results.   --- although those sets share data, so that is expected.  
+# loading unique subset now:  2013_and_2014_mod5_sub2 .......... also success.  
+
+#news_bad_daysSince seems very effective!  but very restrictive.   same but less for noaa_ny_tmax < 90 and. and shortInterest_nDaysSinceLast > 0 and 
+
+
+#helpful but restrictive: 
+#mktAve_mt_vwIntraDayPriceChangePct < 0 and 
+#mktAve_mt_vwPriceChangePct_day < 1 and 
+
+
+
+
+select count(*) as "ct", count( DISTINCT(date) ) as "days",
+round(avg(futChange_weekPct),2) as ".\n.\n.\nwk",		round((count( DISTINCT(date) ) * avg(futChange_weekPct)),0) as "*",		round(100 * SUM(if(futChange_weekPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_2weekPct),2) as ".\n.\n.\n2wk",		round((count( DISTINCT(date) ) * avg(futChange_2weekPct)),0) as "*",	round(100 * SUM(if(futChange_2weekPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_monthPct),2) as ".\n.\n.\nmo",		round((count( DISTINCT(date) ) * avg(futChange_monthPct)),0) as "*",	round(100 * SUM(if(futChange_monthPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_3monthPct),2) as ".\n.\n.\n3mo",	round((count( DISTINCT(date) ) * avg(futChange_3monthPct)),0) as "*",	round(100 * SUM(if(futChange_3monthPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_6monthPct),2) as ".\n.\n.\n6mo",	round((count( DISTINCT(date) ) * avg(futChange_6monthPct)),0) as "*",	round(100 * SUM(if(futChange_6monthPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_yearPct),2) as ".\n.\n.\nyr",		round((count( DISTINCT(date) ) * avg(futChange_yearPct)),0) as "*",		round(100 * SUM(if(futChange_yearPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_2yearPct),2) as ".\n.\n.\n2yr",		round((count( DISTINCT(date) ) * avg(futChange_2yearPct)),0) as "*",	round(100 * SUM(if(futChange_2yearPct > 0, 1, 0))/count(*),0) AS "> 0"
+ from from_1995_mod100_sub1 where 
+#ticker > "D" and 
+#year = 2014 and
+##cap < 1000000000 and 
+#ceo_age_1 > 30 and 
+#ceo_age_2 > 30 and 
+#ceo_age_aveAll > 30 and 
+#ceo_duration_1 > 2 and 
+#news_daysSince > 0 and 
+#news_bad_daysSince > 0 and 					#great but restrictive
+#noaa_ny_tmax < 60 and							#great but restrictive
+#shortInterest_nDaysSinceLast > 0 and 			#great but restrictive		#2014 only
+numDaysUntilSecReport > 40 and
+MS_Financials_EarningsPerShare > -10 and 
+AG_3 < .3 and
+#iy_dPt_PE < 0 and
+#PE > 0 and # and  PE < 20 and 
+#PEG < 10 and #PEG > -3 and
+#PE < 15 and  PE > -3 and 
+#PC > -10 and PC < 280 and 
+#CCR < 1 and
+rPriceChangePct_prevDay1 < 1 and 		#remove?
+rPriceChangePct_day < 5 and 				#remove?
+priceChangePct_week < 5 and 
+rPriceChangePct_month < 5 and	#priceChangePct_month > -3 and 					## %er 
+priceChangePct_3months < -10 and
+priceChangePct_6months < -10 and
+volume > 100000 and
+true; 
+
+#notes:  smaller-caps stocked had higher pct gain, but not enough to raise $
+# developed this screen on 2013_and_2014_mod5_sub1_mod3_sub1
+# then tested on 2013_and_2014_mod5_sub1  - basically same results.   --- although those sets share data, so that is expected.  
+# loading unique subset now:  2013_and_2014_mod5_sub2 .......... also success.  
+
+#news_bad_daysSince seems very effective!  but very restrictive.   same but less for noaa_ny_tmax < 90 and. and shortInterest_nDaysSinceLast > 0 and 
+
+
+#helpful but restrictive: 
+#mktAve_mt_vwIntraDayPriceChangePct < 0 and 
+#mktAve_mt_vwPriceChangePct_day < 1 and 
+
+
+TODO ave volume is wrong!?
+
+select count(*) as "ct", count( DISTINCT(date) ) as "days",
+#round(avg(futChange_dayPct),2) as ".\n\n\nday",			round((count( DISTINCT(date) ) * avg(futChange_dayPct)),0) as "*",		round(100 * SUM(if(futChange_dayPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_2dayPct),2) as ".\n\n\n2day",		round((count( DISTINCT(date) ) * avg(futChange_2dayPct)),0) as "*",		round(100 * SUM(if(futChange_2dayPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_weekPct),2) as ".\n\n\nwk",			round((count( DISTINCT(date) ) * avg(futChange_weekPct)),0) as "*",		round(100 * SUM(if(futChange_weekPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_2weekPct),2) as ".\n\n\n2wk",		round((count( DISTINCT(date) ) * avg(futChange_2weekPct)),0) as "*",	round(100 * SUM(if(futChange_2weekPct > 0, 1, 0))/count(*),0) AS "> 0"
+#round(avg(futChange_monthPct),2) as ".\n\n\nmo",		round((count( DISTINCT(date) ) * avg(futChange_monthPct)),0) as "*",	round(100 * SUM(if(futChange_monthPct > 0, 1, 0))/count(*),0) AS "> 0",
+#round(avg(futChange_3monthPct),2) as ".\n\n\n3mo",		round((count( DISTINCT(date) ) * avg(futChange_3monthPct)),0) as "*",	round(100 * SUM(if(futChange_3monthPct > 0, 1, 0))/count(*),0) AS "> 0",
+#round(avg(futChange_6monthPct),2) as ".\n\n\n6mo",		round((count( DISTINCT(date) ) * avg(futChange_6monthPct)),0) as "*",	round(100 * SUM(if(futChange_6monthPct > 0, 1, 0))/count(*),0) AS "> 0",
+#round(avg(futChange_yearPct),2) as ".\n\n\nyr",			round((count( DISTINCT(date) ) * avg(futChange_yearPct)),0) as "*",		round(100 * SUM(if(futChange_yearPct > 0, 1, 0))/count(*),0) AS "> 0",
+#round(avg(futChange_2yearPct),2) as ".\n\n\n2yr",		round((count( DISTINCT(date) ) * avg(futChange_2yearPct)),0) as "*",	round(100 * SUM(if(futChange_2yearPct > 0, 1, 0))/count(*),0) AS "> 0"
+ from from_1995_after2004_reducedVar_mod20_sub1 where 
+ #year = 2014 and 
+#news_bad_daysSince > 0 and 					#great but restrictive
+ noaa_ny_tmax < 280 and #100 and							#great but restrictive
+#shortInterest_nDaysSinceLast > 0 and 			#great but restrictive		#2014 only
+numDaysUntilSecReport > 35 and
+numDaysSinceSecReport > 6 and
+MS_Financials_EarningsPerShare > -10 and 
+AG_3 < .3 and
+#RSI_14 < 50 and 
+#sr_dPt_PEG < 0 and
+#iy_dPt_PEG < 0 and
+#sr_dPt_PE < 0 and
+#iy_dPt_PE < 0 and
+#PE > -3  and  PE < 10 and 
+#PEG < 2 and #PEG > -3 and
+#PE < 15 and  PE > -3 and 
+#PC > -10 and PC < 280 and 
+#CCR < .5 and
+#rPriceChangePct_prevDay1 < 1 and 		#remove?
+#priceChangePct_day < 10 and 				#remove?
+priceChangePct_week < 5 and 
+priceChangePct_month < 5 and	#priceChangePct_month > -3 and 					## %er 
+priceChangePct_3months < -10 and
+ave_volume_2wk > 100000 and
+true; 
+
+#notes:  smaller-caps stocked had higher pct gain, but not enough to raise $
+# developed this screen on 2013_and_2014_mod5_sub1_mod3_sub1
+# then tested on 2013_and_2014_mod5_sub1  - basically same results.   --- although those sets share data, so that is expected.  
+# loading unique subset now:  2013_and_2014_mod5_sub2 .......... also success.  
+
+#news_bad_daysSince seems very effective!  but very restrictive.   same but less for noaa_ny_tmax < 90 and. and shortInterest_nDaysSinceLast > 0 and 
+
+#great for "> 0"! 
+#in 2014
+#sr_dPt_PEG < 0 and
+#iy_dPt_PEG < 0 and
+#sr_dPt_PE < 0 and
+#iy_dPt_PE < 0 and
+#in all time:
+# noaa_ny_tmax < 180
+
+
+# 
+ct, days, .
+
+
+2day, *, > 0, .
+
+
+wk, *, > 0, .
+
+
+2wk, *, > 0
+8388, 1404, 0.71, 1001, 53, 1.65, 2320, 57, 2.01, 2819, 57
+
+
+------------------------------
+BEST FOR 2014!
+
+select count(*) as "ct", count( DISTINCT(date) ) as "days",
+#round(avg(futChange_dayPct),2) as ".\n\n\nday",			round((count( DISTINCT(date) ) * avg(futChange_dayPct)),0) as "*",		round(100 * SUM(if(futChange_dayPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_2dayPct),2) as ".\n\n\n2day",		round((count( DISTINCT(date) ) * avg(futChange_2dayPct)),0) as "*",		round(100 * SUM(if(futChange_2dayPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_weekPct),2) as ".\n\n\nwk",			round((count( DISTINCT(date) ) * avg(futChange_weekPct)),0) as "*",		round(100 * SUM(if(futChange_weekPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_2weekPct),2) as ".\n\n\n2wk",		round((count( DISTINCT(date) ) * avg(futChange_2weekPct)),0) as "*",	round(100 * SUM(if(futChange_2weekPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_monthPct),2) as ".\n\n\nmo",		round((count( DISTINCT(date) ) * avg(futChange_monthPct)),0) as "*",	round(100 * SUM(if(futChange_monthPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_3monthPct),2) as ".\n\n\n3mo",		round((count( DISTINCT(date) ) * avg(futChange_3monthPct)),0) as "*",	round(100 * SUM(if(futChange_3monthPct > 0, 1, 0))/count(*),0) AS "> 0"
+#round(avg(futChange_6monthPct),2) as ".\n\n\n6mo",		round((count( DISTINCT(date) ) * avg(futChange_6monthPct)),0) as "*",	round(100 * SUM(if(futChange_6monthPct > 0, 1, 0))/count(*),0) AS "> 0",
+#round(avg(futChange_yearPct),2) as ".\n\n\nyr",			round((count( DISTINCT(date) ) * avg(futChange_yearPct)),0) as "*",		round(100 * SUM(if(futChange_yearPct > 0, 1, 0))/count(*),0) AS "> 0",
+#round(avg(futChange_2yearPct),2) as ".\n\n\n2yr",		round((count( DISTINCT(date) ) * avg(futChange_2yearPct)),0) as "*",	round(100 * SUM(if(futChange_2yearPct > 0, 1, 0))/count(*),0) AS "> 0"
+ from from_1995_after2013_reducedvar_mod4_sub2 where 
+ #year = 2013 and 
+ #date > 20140615 and 
+news_daysSince > 0 and 					#great but restrictive
+ceo_age_1 > 30 and 
+ceo_age_2 > 30 and 
+ceo_age_aveAll > 30 and 
+ceo_duration_1 > 2 and 
+ #noaa_ny_tmax < 180 and #100 and							#great but restrictive
+shortInterest_nDaysSinceLast > 2 and 			#great but restrictive		#2014 only
+numDaysUntilSecReport > 35 and
+#numDaysSinceSecReport > 6 and
+MS_Financials_EarningsPerShare > -10 and 
+AG_3 < .3 and
+#RSI_14 < 50 and 
+#sr_dPt_PEG < 0.5 and
+#iy_dPt_PEG < 0.5 and
+#sr_dPt_PE < 0.5 and
+#iy_dPt_PE < 0.5 and
+EMA_3m5 < 0.1 and 
+EMA_3m9 < -0.1 and 
+EMA_3m20 < -0.2 and 
+EMA_3m50 < -0.2 and 
+EMA_3m200 < -0.2 and 
+PE > -3  and  PE < 10 and 
+PB < 5 and 
+#PEG < 2 and PEG > -3 and
+#PE < 15 and  PE > -3 and 
+#PC > -10 and PC < 10 and 		#maybe?
+#CCR < .5 and
+#rPriceChangePct_prevDay1 < 1 and 		#remove?
+#priceChangePct_day < 1 and 				#remove?
+priceChangePct_week < 5 and 
+priceChangePct_month < 5 and	#priceChangePct_month > -3 and 					## %er 
+priceChangePct_3months < -10 and
+ave_volume_2wk > 100000 and
+true; 
+
+#notes:  smaller-caps stocked had higher pct gain, but not enough to raise $
+# developed this screen on 2013_and_2014_mod5_sub1_mod3_sub1
+# then tested on 2013_and_2014_mod5_sub1  - basically same results.   --- although those sets share data, so that is expected.  
+# loading unique subset now:  2013_and_2014_mod5_sub2 .......... also success.  
+
+#news_bad_daysSince seems very effective!  but very restrictive.   same but less for noaa_ny_tmax < 90 and. and shortInterest_nDaysSinceLast > 0 and 
+
+#great for "> 0"! 
+#in 2014
+#sr_dPt_PEG < 0 and
+#iy_dPt_PEG < 0 and
+#sr_dPt_PE < 0 and
+#iy_dPt_PE < 0 and
+#in all time:
+# noaa_ny_tmax < 180
+
+# ct, days, .
+
+
+2day, *, > 0, .
+
+
+wk, *, > 0, .
+
+
+2wk, *, > 0, .
+
+
+mo, *, > 0, .
+
+
+3mo, *, > 0
+113, 60, 0.42, 25, 58, 1.42, 85, 58, 2.14, 128, 55, 3.66, 219, 55, 14.30, 858, 53
+
+
+
+$350ish for all us stocks since 1985
+free for "A" stocks!? http://www.premiumdata.net/products/premiumdata/ushistorical.php#trial 
+http://www.premiumdata.net/products/premiumdata/index.php
+
+-------------
+
+best for all years!
+
+select count(*) as "ct", count( DISTINCT(date) ) as "days",
+#round(avg(futChange_dayPct),2) as ".\n\n\nday",			round((count( DISTINCT(date) ) * avg(futChange_dayPct)),0) as "*",		round(100 * SUM(if(futChange_dayPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_2dayPct),2) as ".\n\n\n2day",		round((count( DISTINCT(date) ) * avg(futChange_2dayPct)),0) as "*",		round(100 * SUM(if(futChange_2dayPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_weekPct),2) as ".\n\n\nwk",			round((count( DISTINCT(date) ) * avg(futChange_weekPct)),0) as "*",		round(100 * SUM(if(futChange_weekPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_2weekPct),2) as ".\n\n\n2wk",		round((count( DISTINCT(date) ) * avg(futChange_2weekPct)),0) as "*",	round(100 * SUM(if(futChange_2weekPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_monthPct),2) as ".\n\n\nmo",		round((count( DISTINCT(date) ) * avg(futChange_monthPct)),0) as "*",	round(100 * SUM(if(futChange_monthPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_3monthPct),2) as ".\n\n\n3mo",		round((count( DISTINCT(date) ) * avg(futChange_3monthPct)),0) as "*",	round(100 * SUM(if(futChange_3monthPct > 0, 1, 0))/count(*),0) AS "> 0"
+#round(avg(futChange_6monthPct),2) as ".\n\n\n6mo",		round((count( DISTINCT(date) ) * avg(futChange_6monthPct)),0) as "*",	round(100 * SUM(if(futChange_6monthPct > 0, 1, 0))/count(*),0) AS "> 0",
+#round(avg(futChange_yearPct),2) as ".\n\n\nyr",			round((count( DISTINCT(date) ) * avg(futChange_yearPct)),0) as "*",		round(100 * SUM(if(futChange_yearPct > 0, 1, 0))/count(*),0) AS "> 0",
+#round(avg(futChange_2yearPct),2) as ".\n\n\n2yr",		round((count( DISTINCT(date) ) * avg(futChange_2yearPct)),0) as "*",	round(100 * SUM(if(futChange_2yearPct > 0, 1, 0))/count(*),0) AS "> 0"
+ from from_1995_after2004_reducedvar_mod20_sub5 where 
+ #year = 2007 and 
+ #date > 20140615 and 
+news_daysSince > 0 and 					#great but restrictive
+numDaysUntilSecReport > 35 and
+#numDaysSinceSecReport > 6 and
+#MS_Financials_EarningsPerShare > -10 and 
+AG_3 < .3 and
+#RSI_14 < 50 and 
+#sr_dPt_PEG < 0.5 and
+#iy_dPt_PEG < 0.5 and
+#sr_dPt_PE < 0.5 and
+#iy_dPt_PE < 0.5 and
+EMA_3m5 < -0.1 and 
+EMA_3m9 < -0.2 and 
+EMA_3m20 < -0.1 and 
+EMA_3m50 < -0.1 and 
+EMA_3m200 < 0.2 and 
+PE > -3  and  PE < 10 and 
+PB < 5 and 
+#PEG < 2 and PEG > -3 and
+#PE < 15 and  PE > -3 and 
+#PC > -10 and PC < 10 and 		#maybe?
+#CCR < .5 and
+#rPriceChangePct_prevDay1 < 1 and 		#remove?
+#priceChangePct_day < -2 and 				#remove?
+priceChangePct_week < 5 and 
+priceChangePct_month < 5 and	#priceChangePct_month > -3 and 					## %er 
+priceChangePct_3months < -10 and
+ave_volume_2wk > 100000 and
+true; 
+
+#notes:  smaller-caps stocked had higher pct gain, but not enough to raise $
+# developed this screen on 2013_and_2014_mod5_sub1_mod3_sub1
+# then tested on 2013_and_2014_mod5_sub1  - basically same results.   --- although those sets share data, so that is expected.  
+# loading unique subset now:  2013_and_2014_mod5_sub2 .......... also success.  
+
+#news_bad_daysSince seems very effective!  but very restrictive.   same but less for noaa_ny_tmax < 90 and. and shortInterest_nDaysSinceLast > 0 and 
+
+#great for "> 0"! 
+#in 2014
+#sr_dPt_PEG < 0 and
+#iy_dPt_PEG < 0 and
+#sr_dPt_PE < 0 and
+#iy_dPt_PE < 0 and
+#in all time:
+# noaa_ny_tmax < 180
+
+# ct, days, .
+
+
+2day, *, > 0, .
+
+
+wk, *, > 0, .
+
+
+2wk, *, > 0, .
+
+
+mo, *, > 0, .
+
+
+3mo, *, > 0
+417, 268, 0.44, 118, 52, 1.96, 526, 55, 2.84, 760, 57, 5.63, 1510, 62, 8.53, 2286, 59
+
+
+
+-----------
+actually this is better
+select count(*) as "ct", count( DISTINCT(date) ) as "days",
+#round(avg(futChange_dayPct),2) as ".\n\n\nday",			round((count( DISTINCT(date) ) * avg(futChange_dayPct)),0) as "*",		round(100 * SUM(if(futChange_dayPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_2dayPct),2) as ".\n\n\n2day",		round((count( DISTINCT(date) ) * avg(futChange_2dayPct)),0) as "*",		round(100 * SUM(if(futChange_2dayPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_weekPct),2) as ".\n\n\nwk",			round((count( DISTINCT(date) ) * avg(futChange_weekPct)),0) as "*",		round(100 * SUM(if(futChange_weekPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_2weekPct),2) as ".\n\n\n2wk",		round((count( DISTINCT(date) ) * avg(futChange_2weekPct)),0) as "*",	round(100 * SUM(if(futChange_2weekPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_monthPct),2) as ".\n\n\nmo",		round((count( DISTINCT(date) ) * avg(futChange_monthPct)),0) as "*",	round(100 * SUM(if(futChange_monthPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_3monthPct),2) as ".\n\n\n3mo",		round((count( DISTINCT(date) ) * avg(futChange_3monthPct)),0) as "*",	round(100 * SUM(if(futChange_3monthPct > 0, 1, 0))/count(*),0) AS "> 0"
+#round(avg(futChange_6monthPct),2) as ".\n\n\n6mo",		round((count( DISTINCT(date) ) * avg(futChange_6monthPct)),0) as "*",	round(100 * SUM(if(futChange_6monthPct > 0, 1, 0))/count(*),0) AS "> 0",
+#round(avg(futChange_yearPct),2) as ".\n\n\nyr",			round((count( DISTINCT(date) ) * avg(futChange_yearPct)),0) as "*",		round(100 * SUM(if(futChange_yearPct > 0, 1, 0))/count(*),0) AS "> 0",
+#round(avg(futChange_2yearPct),2) as ".\n\n\n2yr",		round((count( DISTINCT(date) ) * avg(futChange_2yearPct)),0) as "*",	round(100 * SUM(if(futChange_2yearPct > 0, 1, 0))/count(*),0) AS "> 0"
+ from from_1995_after2004_reducedvar_mod20_sub5 where 
+ #year = 2007 and 
+ #date > 20140615 and 
+news_daysSince > 0 and 					#great but restrictive
+numDaysUntilSecReport > 35 and
+#numDaysSinceSecReport > 6 and
+#MS_Financials_EarningsPerShare > -10 and 
+AG_3 < .3 and
+#RSI_14 < 50 and 
+#sr_dPt_PEG < 0.5 and
+#iy_dPt_PEG < 0.5 and
+#sr_dPt_PE < 0.5 and
+#iy_dPt_PE < 0.5 and
+EMA_3m5 < -0.1 and 
+EMA_3m9 < -0.2 and 
+EMA_3m20 < -0.1 and 
+EMA_3m50 < -0.1 and 
+EMA_3m200 < 0.2 and 
+PE > -3  and  PE < 10 and 
+PB < 5 and 
+#PEG < 2 and PEG > -3 and
+#PE < 15 and  PE > -3 and 
+#PC > -10 and PC < 10 and 		#maybe?
+#CCR < -0.4 and
+#rPriceChangePct_prevDay1 < 1 and 		#remove?
+priceChangePct_day < 5 and 				#remove?
+priceChangePct_week < 5 and 
+priceChangePct_month < 5 and	#priceChangePct_month > -3 and 					## %er 
+priceChangePct_3months < -10 and
+ave_volume_2wk > 100000 and
+true; 
+
+#notes:  smaller-caps stocked had higher pct gain, but not enough to raise $
+# developed this screen on 2013_and_2014_mod5_sub1_mod3_sub1
+# then tested on 2013_and_2014_mod5_sub1  - basically same results.   --- although those sets share data, so that is expected.  
+# loading unique subset now:  2013_and_2014_mod5_sub2 .......... also success.  
+
+#news_bad_daysSince seems very effective!  but very restrictive.   same but less for noaa_ny_tmax < 90 and. and shortInterest_nDaysSinceLast > 0 and 
+
+#great for "> 0"! 
+#in 2014
+#sr_dPt_PEG < 0 and
+#iy_dPt_PEG < 0 and
+#sr_dPt_PE < 0 and
+#iy_dPt_PE < 0 and
+#in all time:
+# noaa_ny_tmax < 180
+
+# ct, days, .
+
+# ct, days, .
+
+
+2day, *, > 0, .
+
+
+wk, *, > 0, .
+
+
+2wk, *, > 0, .
+
+
+mo, *, > 0, .
+
+
+3mo, *, > 0
+435, 280, 0.30, 84, 51, 2.37, 663, 56, 3.16, 885, 57, 6.17, 1728, 62, 9.87, 2763, 60
+
+
+
+--------------------
+
+all years all data!  THIS IS AMAZING
+
+select count(*) as "ct", count( DISTINCT(date) ) as "days",
+round(avg(futChange_2dayPct),2) as ".\n\n\n2day",		round((count( DISTINCT(date) ) * avg(futChange_2dayPct)),0) as "*",		round(100 * SUM(if(futChange_2dayPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_weekPct),2) as ".\n\n\nwk",			round((count( DISTINCT(date) ) * avg(futChange_weekPct)),0) as "*",		round(100 * SUM(if(futChange_weekPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_2weekPct),2) as ".\n\n\n2wk",		round((count( DISTINCT(date) ) * avg(futChange_2weekPct)),0) as "*",	round(100 * SUM(if(futChange_2weekPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_monthPct),2) as ".\n\n\nmo",		round((count( DISTINCT(date) ) * avg(futChange_monthPct)),0) as "*",	round(100 * SUM(if(futChange_monthPct > 0, 1, 0))/count(*),0) AS "> 0",
+round(avg(futChange_3monthPct),2) as ".\n\n\n3mo",		round((count( DISTINCT(date) ) * avg(futChange_3monthPct)),0) as "*",	round(100 * SUM(if(futChange_3monthPct > 0, 1, 0))/count(*),0) AS "> 0"
+ #from from_1995_after2013_reducedvar_mod4_sub1 where
+#from from_1995_after2004_reducedvar_mod20_sub1 where
+from from_1995_after2004_reducedvar where 
+#year = 2007 and 
+ #date > 20140615 and 
+#ceo_age_1 > 30 and 
+#ceo_age_2 > 30 and 
+#ceo_age_aveAll > 30 and 
+#ceo_duration_1 > 2 and 
+#shortInterest_nDaysSinceLast > 2 and 			#great but restrictive		#2014 only
+#news_daysSince > 0 and 					#great but restrictive
+#noaa_ny_prcp = 0 and #100 and							#great but restrictive
+#noaa_ny_tmax < 90 and #270 and #100 and							#great but restrictive
+numDaysUntilSecReport > 35 and
+numDaysSinceSecReport > 6 and				##????????
+MS_Financials_EarningsPerShare > -10 and 
+AG_3 < .3 and
+EMA_3m5 < 0.1 and 
+EMA_3m9 < -0.2 and 
+EMA_3m20 < -0.1 and 
+EMA_3m50 < -0.1 and 
+EMA_3m200 < 0.2 and 
+iy_dPt_EMA_3m5 < 0 and 
+iy_dPt_EMA_3m9 < 0 and 
+iy_dPt_EMA_3m20 < 0 and 
+iy_dPt_EMA_3m50 < 0 and 
+iy_dPt_EMA_3m200 < 0 and 
+PE > -3  and  PE < 10 and 
+PB < 5 and 
+priceChangePct_day < 5 and 				#remove?
+priceChangePct_week < 5 and 
+priceChangePct_month < 5 and	#priceChangePct_month > -3 and 					## %er 
+priceChangePct_3months < -10 and
+ave_volume_2wk > 100000 and
+true; 
+
+# ct, days, .
+
+
+2day, *, > 0, .
+
+
+wk, *, > 0, .
+
+
+2wk, *, > 0, .
+
+
+mo, *, > 0, .
+
+
+3mo, *, > 0
+5657, 1419, 1.40, 1986, 56, 3.66, 5198, 61, 4.17, 5911, 59, 5.58, 7913, 60, 4.87, 6904, 56
+
+
+-------------------------
+
+
+next:  develop same-day analysis? or more variables work?  rank? .... eh.   put dPt's back ??  both?
+
+1.  download weather automatically
+2.  make production method faster -- do parallel stuff
+
+production processing should take about 8 minutes, after all data is downloaded.  
+took 13 minutes with stupid Make_Stitched_part3 desigh
+
+TODO -- overhaul -- store data as ints?  (decimals times 100) -- no. doesn't help.  weirdly.
+
+looks good in notepad and netbeans.  best screen from mysql on other computer:
+
+screen
+loose @ futChange_intraDayPct, futChange_dayPct, futChange_day2Pct, futChange_2dayPct, futChange_weekPct, futChange_2weekPct,futChange_monthPct,futChange_3monthPct,futChange_6monthPct,futChange_yearPct,futChange_2yearPct:                                
+ceo_compensation_1,                 1,        1e10    ;                                                                            
+ceo_compensation_2,                 1,        1e10    ;                                                                            
+ceo_compensation_3,                 1,        1e10    ;                                                                            
+ceo_compensation_aveAll,            1,        1e10    ;                                                                            
+ceo_age_1,                          31,       1e10    ;                                                                            
+ceo_age_2,                          31,       1e10    ;                                                                            
+ceo_age_aveAll,                     31,       1e10    ;                                                                            
+ceo_duration_1,                     3,        1e10    ;                                                                                 
+shortInterest_nDaysSinceLast,       3,        1e10    ;    #great but restrictive #2014 only                                                                            
+news_daysSince,                     1,        1e10    ;    #great but restrictive                                                                             
+#noaa_ny_prcp,                      0,        0       ;    #100 and  #great but restrictive                                                                         
+#noaa_ny_tmax,                      -1e10,    90      ;        #270 and #100 and #great but restrictive                                                                        
+numDaysUntilSecReport,              36,       1e10    ;                                                                            
+numDaysSinceSecReport,              7,        1e10    ;    ##????????                                                                         
+MS_Financials_EarningsPerShare,     -10,      1e10    ;                                                                            
+AG_3,                               -1e10,    0.3     ;                                                                            
+EMA_3m5,                            -1e10,    0.1     ;                                                                            
+EMA_3m9,                            -1e10,    -0.2    ;                                                                            
+EMA_3m20,                           -1e10,    -0.1    ;                                                                            
+EMA_3m50,                           -1e10,    -0.1    ;                                                                            
+EMA_3m200,                          -1e10,    0.2     ;                                                                            
+iy_dPt_EMA_3m5,                     -1e10,    0       ;                                                                            
+iy_dPt_EMA_3m9,                     -1e10,    0       ;                                                                            
+iy_dPt_EMA_3m20,                    -1e10,    0       ;                                                                            
+iy_dPt_EMA_3m50,                    -1e10,    0       ;                                                                            
+iy_dPt_EMA_3m200,                   -1e10,    0       ;                                                                            
+PE,                                 -3,       10      ;   # and PE < 10 and                                                                         
+PB,                                 -1e10,    5       ;                                                                            
+priceChangePct_day,                 -1e10,    5       ;    #remove?                                                                         
+priceChangePct_week,                -1e10,    5       ;                                                                            
+priceChangePct_month,               -1e10,    5       ;    #priceChangePct_month > -3 and ## %er                                                                         
+priceChangePct_3months,             -1e10,    -10     ;                                                                            
+ave_volume_2wk,                     100000,   1e10    ;  
+go!  	                                                                         
+
+------------------------------------------
+
+
+screen
+strict @ futChange_intraDayPct, futChange_dayPct, futChange_2dayPct, futChange_weekPct, futChange_2weekPct,futChange_monthPct:
+#ceo_compensation_1,                 1,        1e20    ;                                                                            
+#ceo_compensation_2,                 1,        1e20    ;                                                                            
+#ceo_compensation_3,                 1,        1e20    ;                                                                            
+#ceo_compensation_aveAll,            1,        1e20    ;                                                                            
+ceo_age_1,                          31,       1e20    ;                                                                            
+ceo_age_2,                          31,       1e20    ;                                                                            
+ceo_age_aveAll,                     31,       1e20    ;                                                                            
+ceo_duration_1,                     3,        1e20    ;                                                                                 
+shortInterest_nDaysSinceLast,       3,        1e20    ;    #great but restrictive #2014 only                                                                            
+news_daysSince,                     1,        1e20    ;    #great but restrictive                                                                             
+##noaa_ny_prcp,                      0,        0       ;    #100 and  #great but restrictive                                                                         
+noaa_ny_tmax,                      -1e20,    270      ;        #270 and #100 and #great but restrictive                                                                        
+numDaysUntilSecReport,              36,       1e20    ;                                                                            
+numDaysSinceSecReport,              7,        1e20    ;    ##????????                                                                         
+MS_Financials_EarningsPerShare,     -10,      1e20    ;                                                                            
+AG_3,                               -1e20,    0.3     ;                                                                            
+EMA_3m5,                            -1e20,    0.0     ;                                                                            
+EMA_3m9,                            -1e20,    -0.2    ;                                                                            
+EMA_3m20,                           -1e20,    -0.2    ;                                                                            
+#EMA_3m50,                           -1e20,    -0.1    ;                                                                            
+#EMA_3m200,                          -1e20,    0.2     ;                                                                            
+iy_dPt_EMA_3m5,                     -1e20,    -0.1       ;                                                                            
+iy_dPt_EMA_3m9,                     -1e20,    -0.1       ;                                                                            
+iy_dPt_EMA_3m20,                    -1e20,    -0.1       ;                                                                            
+#iy_dPt_EMA_3m50,                    -1e20,    0       ;                                                                            
+#iy_dPt_EMA_3m200,                   -1e20,    0       ;                                                                            
+PE,                                 -3,       10      ;   # and PE < 10 and                                                                         
+PB,                                 0,    5       ;                                                                            
+priceChangePct_day,                 -1e20,    5       ;    #remove?                                                                         
+priceChangePct_week,                -1e20,    5       ;                                                                            
+priceChangePct_month,               -1e20,    5       ;    #priceChangePct_month > -3 and ## %er                                                                         
+#priceChangePct_3months,             -1e20,    -10     ;                                                                            
+ave_volume_2wk,                     100000,   1e20    ;  
+go!  	                                                                         
+
+
+//TODO -- store all data as ints.  so we get tiny data storage (i byte) for value<128.  multiply by 0.01 in arrays.  for i-index data matrix, if var is non-null for i = 100 to max, only set this array to 0-index at i = 100.  so have a list of var arrays and also the relative starting and stopping points.  so we're not storing lots of nulls
+// use maps or lists of arrays or objects.  enum? 
+
+
+//TODO - implement standalone looping screener.  no input! just loop.  ok needs input.
+//what input?  just return.
+
+//watch dominion's earnings report! after close friday feb 6
+
+subset n = 15
+priceChPct_day <= 4; priceChPct_week <= 4; priceChPct_month <= 4; priceChPct_2month <= -4; PB <= 7; PE >= -3, <= 10; PFCF <= -10000; priceChPct_day <= 0; priceChPct_week <= 0; priceChPct_month <= -1; priceChPct_2month <= -2; priceChPct_day <= -1; priceChPct_week <= -1; priceChPct_month <= -3; priceChPct_2month <= -5; Earnings_numDaysSince >= 1; Earnings_numDaysUntil >= 15; vol >= 100000; 
+                               yVar     ave      n  pctGt0  pctGt1          ave*n      period
+                      futChPct_week *       *    0 *       *       *              *      2004
+                      futChPct_week *  1.82 *   13 *    46 *    38 *        23.64 *      2005
+                      futChPct_week *  0.41 *   95 *    46 *    38 *        39.01 *      2006
+                      futChPct_week *  0.66 *  161 *    44 *    42 *       106.14 *      2007
+                      futChPct_week *  1.76 *  372 *    44 *    41 *       654.34 *      2008
+                      futChPct_week *  3.91 *  272 *    54 *    53 *      1064.23 *      2009
+                      futChPct_week *  3.05 *  167 *    59 *    53 *       508.75 *      2010
+                      futChPct_week *  5.22 *  136 *    64 *    58 *       709.77 *      2011
+                      futChPct_week *  7.25 *  121 *    50 *    47 *       876.76 *      2012
+                      futChPct_week * 14.69 *  136 *    55 *    49 *      1997.73 *      2013
+                      futChPct_week *  0.10 *  122 *    50 *    46 *        12.34 *      2014
+                      futChPct_week * 12.80 *   26 *    61 *    53 *       332.82 *      2015
+                      futChPct_week *  2.78 *  343 *    52 *    50 *       952.27 *    MONDAY
+                      futChPct_week *  5.27 *  330 *    50 *    47 *      1740.61 *   TUESDAY
+                      futChPct_week *  7.67 *  325 *    51 *    48 *      2492.33 * WEDNESDAY
+                      futChPct_week *  2.99 *  308 *    52 *    47 *       919.62 *  THURSDAY
+                      futChPct_week *  0.70 *  315 *    50 *    45 *       220.70 *    FRIDAY
+                      futChPct_year              0                                       2004
+                      futChPct_year  117.68     13      92      92        1529.78        2005
+                      futChPct_year  -14.77     95      28      28       -1403.23        2006
+                      futChPct_year  -22.93    161      19      19       -3690.95        2007
+                      futChPct_year  109.85    372      59      59       40864.03        2008
+                      futChPct_year  262.24    272      85      84       71329.78        2009
+                      futChPct_year   70.09    167      75      74       11705.76        2010
+                      futChPct_year   65.28    136      46      46        8878.55        2011
+                      futChPct_year  204.70    121      83      83       24768.98        2012
+                      futChPct_year   45.18    136      68      67        6145.00        2013
+                      futChPct_year   10.57     27      55      55         285.43        2014
+                      futChPct_year              0                                       2015
+                      futChPct_year   86.34    311      57      57       26853.04      MONDAY
+                      futChPct_year  109.57    302      62      61       33091.21     TUESDAY
+                      futChPct_year  120.00    308      63      63       36959.30   WEDNESDAY
+                      futChPct_year  103.13    289      63      63       29805.19    THURSDAY
+                      futChPct_year  116.22    290      61      60       33704.39      FRIDAY
+
+                               yVar     ave      n  pctGt0  pctGt1          ave*n      period
+                      futChPct_week *  3.90 * 1621 *    51 *    47 *      6325.52 *       all
+                      futChPct_year  106.94   1500      61      61      160413.02         all
+1.372 seconds
+for:
+priceChPct_day        $  <=  4   
+priceChPct_week       $  <=  4                    
+priceChPct_month      $  <=  4                 
+priceChPct_2month     $  <=  -4      
+PB      			 $  <= 7         # $  >=  0#           
+PE      			  $  >=  -3  $  <=  10          
+PFCF      		 	  $  <= -10000   # $ <=  20   
+gs priceChPct_day        $  <=  0     
+gs priceChPct_week       $  <=  0                 
+gs priceChPct_month      $  <=  -1                       
+gs priceChPct_2month     $  <=  -2                  
+grc priceChPct_day        $  <=  -1   
+grc priceChPct_week       $  <=  -1                
+grc priceChPct_month      $  <=   -3                     
+grc priceChPct_2month     $  <=  -5  
+Earnings_numDaysSince               $  >=  1 
+Earnings_numDaysUntil               $  >=  15  #  $  <=  20
+vol     			  $  >=  100000  
+
+AG_3 <= 0; priceChPct_day <= -5; priceChPct_week <= -5; priceChPct_month <= -5; priceChPct_2month <= -4; PE <= 2; PB <= 2; PFCF >= -10000; Earnings_numDaysSince >= 5; Earnings_numDaysUntil >= 1; vol >= 100000; 
+                               yVar     ave      n  pctGt0  pctGt1        ave*n     period
+                      futChPct_week *       *    0 *       *       *            *     2004
+                      futChPct_week *  1.19 *    3 *    66 *    33 *       3.56 *     2005
+                      futChPct_week *  5.32 *    4 *    75 *    75 *      21.27 *     2006
+                      futChPct_week *  3.70 *   12 *    83 *    66 *      44.41 *     2007
+                      futChPct_week *  6.08 *  169 *    56 *    56 *    1028.02 *     2008
+                      futChPct_week *  1.67 *   55 *    50 *    49 *      91.84 *     2009
+                      futChPct_week *  7.38 *   28 *    78 *    75 *     206.70 *     2010
+                      futChPct_week *  4.92 *   67 *    68 *    65 *     329.46 *     2011
+                      futChPct_week *  4.78 *   25 *    60 *    56 *     119.42 *     2012
+                      futChPct_week *  3.02 *   16 *    68 *    62 *      48.29 *     2013
+                      futChPct_week *  3.51 *   88 *    62 *    59 *     308.61 *     2014
+                      futChPct_week *  3.66 *   15 *    73 *    66 *      54.90 *     2015
+                      futChPct_week *  6.23 *  120 *    67 *    62 *     748.15 *   MONDAY
+                      futChPct_week *  4.77 *   94 *    59 *    54 *     448.75 *  TUESDAY
+                      futChPct_week *  0.47 *   84 *    51 *    50 *      39.42 *WEDNESDAY
+                      futChPct_week *  6.96 *  113 *    69 *    68 *     786.11 * THURSDAY
+                      futChPct_week *  3.30 *   71 *    57 *    56 *     234.04 *   FRIDAY
+                      futChPct_year              0                                    2004
+                      futChPct_year   33.07      4     100     100       132.29       2005
+                      futChPct_year   64.21      4     100     100       256.84       2006
+                      futChPct_year  -10.29     12      41      41      -123.47       2007
+                      futChPct_year   53.57    169      64      63      9054.06       2008
+                      futChPct_year  199.31     56      96      96     11161.33       2009
+                      futChPct_year   57.64     28      78      78      1613.94       2010
+                      futChPct_year   13.65     66      56      54       900.77       2011
+                      futChPct_year   64.07     25      84      84      1601.76       2012
+                      futChPct_year    6.18     16      43      37        98.87       2013
+                      futChPct_year   -0.19     10      50      50        -1.90       2014
+                      futChPct_year              0                                    2015
+                      futChPct_year   59.80     92      76      76      5501.19     MONDAY
+                      futChPct_year   80.91     68      70      69      5501.84    TUESDAY
+                      futChPct_year   53.69     75      70      68      4026.87  WEDNESDAY
+                      futChPct_year   62.74     97      64      64      6085.84   THURSDAY
+                      futChPct_year   61.70     58      58      58      3578.72     FRIDAY
+
+                               yVar     ave      n  pctGt0  pctGt1        ave*n     period
+                      futChPct_week *  4.68 *  482 *    62 *    59 *    2256.47 *      all
+                      futChPct_year   63.32    390      68      67     24694.46        all
+1.186 seconds
+for:
+-1, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, Mon, Tues, Wed, Thurs, Fri
+futChPct_week,futChPct_year,# futChPct_2week, futChPct_month, futChPct_2month, futChPct_6month,  #futChPct_intraDay, futChPct_day, futChPct_2day, 
+AG_3                  $  <= 0                 
+#ema3m5                $  <=  0
+#ema3m9                $  <=  0               
+#ema3m20               $  <=  0                 
+##ema3m200              $  <=  5                   
+priceChPct_day        $  <=  -5   
+priceChPct_week       $  <=  -5                   
+priceChPct_month      $  <=  -5                 
+priceChPct_2month     $  <=  -4      
+###              
+##
+##SI_numDaysSinceRelease			$ <= 5
+##SI_recent_DaysToCover			$ >= 5
+###
+#PB      			 $  <= 7         # $  >=  0#           
+#PE      			  $  >=  -3  $  <=  10          
+###PFCF      		 	  $  <= -10000   # $ <=  20   
+
+#grc PE                     $ >= 0  
+ys PE                     $  <= 2   
+ys PB                     $  <= 2   
+ys PFCF                     $  >= -10000
+
+###
+###
+#gs AG_3                  $  <=  0                    
+#gs ema3m5                $  <=  0                     
+#gs ema3m9                $  <=  0                 
+#gs ema3m20               $  <=  0                    
+##gs ema3m200              $  <=  0                   
+#gi priceChPct_day        $  <=  0     
+#gi priceChPct_week       $  <=  0                 
+#gi priceChPct_month      $  <=  0                       
+#gi priceChPct_2month     $  <=  0                    
+#gs priceChPct_day        $  <=  0     
+#gs priceChPct_week       $  <=  1                 
+#gs priceChPct_month      $  <=  0                       
+#gs priceChPct_2month     $  <=  -1                  
+#grc priceChPct_day        $  <=  0   
+#grc priceChPct_week       $  <=  0                
+#grc priceChPct_month      $  <=   -1                     
+#grc priceChPct_2month     $  <=  -2 
+#
+Earnings_numDaysSince               $  >=  5 
+Earnings_numDaysUntil               $  >=  1  #  $  <=  20
+
+
+                
+vol     			  $  >=  100000  
+
+
+
+
+#Sec_NumReports                  $  <= 1
+#spl_numDaysUntilGood             $  <= 1 
+#numPressReleasesinPrior_2weeks                    $  >=  0
+#tmax								$ <= 100
+
+AG_3 <= 0; priceChPct_day <= -3; priceChPct_week <= -2; priceChPct_month <= -5; priceChPct_2month <= -5; PE <= 3; PB <= 5; PFCF >= -200000; Earnings_numDaysSince >= 5; Earnings_numDaysUntil >= 1; vol >= 100000; 
+                               yVar     ave      n  pctGt0  pctGt1        ave*n     period
+                      futChPct_week *       *    0 *       *       *            *     2004
+                      futChPct_week *  1.87 *    6 *    83 *    66 *      11.23 *     2005
+                      futChPct_week *  1.39 *   40 *    57 *    52 *      55.51 *     2006
+                      futChPct_week *  0.87 *   73 *    50 *    42 *      63.50 *     2007
+                      futChPct_week *  2.95 *  394 *    56 *    51 *    1164.05 *     2008
+                      futChPct_week *  3.54 *  111 *    55 *    54 *     393.18 *     2009
+                      futChPct_week *  3.10 *  119 *    65 *    63 *     368.42 *     2010
+                      futChPct_week *  0.58 *  108 *    53 *    48 *      63.07 *     2011
+                      futChPct_week * -0.33 *   75 *    53 *    46 *     -25.04 *     2012
+                      futChPct_week *  1.99 *   44 *    63 *    54 *      87.74 *     2013
+                      futChPct_week *  0.72 *  215 *    57 *    52 *     154.02 *     2014
+                      futChPct_week *  5.17 *   31 *    61 *    58 *     160.33 *     2015
+                      futChPct_week *  2.63 *  294 *    58 *    54 *     771.82 *   MONDAY
+                      futChPct_week *  0.98 *  223 *    52 *    47 *     219.28 *  TUESDAY
+                      futChPct_week *  1.28 *  219 *    56 *    48 *     280.89 *WEDNESDAY
+                      futChPct_week *  3.76 *  260 *    62 *    55 *     976.67 * THURSDAY
+                      futChPct_week *  1.12 *  220 *    54 *    53 *     247.36 *   FRIDAY
+                      futChPct_year              0                                    2004
+                      futChPct_year   30.90      6      66      66       185.39       2005
+                      futChPct_year   13.44     40      67      67       537.71       2006
+                      futChPct_year  -41.65     72       8       8     -2998.83       2007
+                      futChPct_year   24.95    394      58      57      9830.10       2008
+                      futChPct_year  120.24    112      85      85     13466.50       2009
+                      futChPct_year   42.02    115      73      73      4832.38       2010
+                      futChPct_year   17.90    108      56      55      1933.68       2011
+                      futChPct_year   40.99     75      68      68      3074.07       2012
+                      futChPct_year   12.67     44      54      52       557.45       2013
+                      futChPct_year  -33.43     10      10      10      -334.31       2014
+                      futChPct_year              0                                    2015
+                      futChPct_year   39.21    218      62      61      8547.27     MONDAY
+                      futChPct_year   21.93    177      53      53      3881.94    TUESDAY
+                      futChPct_year   32.27    182      63      62      5872.92  WEDNESDAY
+                      futChPct_year   32.88    218      59      59      7167.50   THURSDAY
+                      futChPct_year   31.02    181      58      58      5614.51     FRIDAY
+
+                               yVar     ave      n  pctGt0  pctGt1        ave*n     period
+                      futChPct_week *  2.05 * 1216 *    57 *    52 *    2496.01 *      all
+                      futChPct_year   31.85    976      59      59     31084.13        all
+1.326 seconds
+for:
+AG_3                  $  <= 0                 
+priceChPct_day        $  <=  -3  
+priceChPct_week       $  <=  -2                   
+priceChPct_month      $  <=  -2                
+priceChPct_2month     $  <=  -5      
+ys PE                     $  <= 3   
+ys PB                     $  <= 5   
+ys PFCF                     $  >= -200000
+Earnings_numDaysSince               $  >=  5 
+Earnings_numDaysUntil               $  >=  1  #  $  <=  20
+vol     			  $  >=  100000  
+
+
+WEIRD CONTRARIAN SHORTS STRATEGY:  everyone must be over-shorting when the report comes out?
+SI_numDaysSinceRelease <= 1; SI_recent_DaysToCover >= 2; PE >= 6; PB >= 5; PFCF >= 0; vol >= 100000; 
+                               yVar     ave      n  pctGt0  pctGt1        ave*n     period
+                      futChPct_week *       *    0 *       *       *            *     2004
+                      futChPct_week *       *    0 *       *       *            *     2005
+                      futChPct_week *       *    0 *       *       *            *     2006
+                      futChPct_week *       *    0 *       *       *            *     2007
+                      futChPct_week *       *    0 *       *       *            *     2008
+                      futChPct_week *       *    0 *       *       *            *     2009
+                      futChPct_week *       *    0 *       *       *            *     2010
+                      futChPct_week *       *    0 *       *       *            *     2011
+                      futChPct_week *       *    0 *       *       *            *     2012
+                      futChPct_week *       *    0 *       *       *            *     2013
+                      futChPct_week *  1.67 *  298 *    69 *    56 *     496.26 *     2014
+                      futChPct_week *  1.32 *   71 *    59 *    47 *      94.07 *     2015
+                      futChPct_week *  1.92 *  130 *    70 *    56 *     249.74 *   MONDAY
+                      futChPct_week *  1.35 *  128 *    61 *    45 *     172.87 *  TUESDAY
+                      futChPct_week *  1.32 *   35 *    71 *    65 *      46.03 *WEDNESDAY
+                      futChPct_week *  0.22 *   29 *    55 *    48 *       6.30 * THURSDAY
+                      futChPct_week *  2.46 *   47 *    80 *    72 *     115.39 *   FRIDAY
+                      futChPct_year              0                                    2004
+                      futChPct_year              0                                    2005
+                      futChPct_year              0                                    2006
+                      futChPct_year              0                                    2007
+                      futChPct_year              0                                    2008
+                      futChPct_year              0                                    2009
+                      futChPct_year              0                                    2010
+                      futChPct_year              0                                    2011
+                      futChPct_year              0                                    2012
+                      futChPct_year              0                                    2013
+                      futChPct_year   17.89      2     100     100        35.77       2014
+                      futChPct_year              0                                    2015
+                      futChPct_year   19.16      1     100     100        19.16     MONDAY
+                      futChPct_year   16.61      1     100     100        16.61    TUESDAY
+                      futChPct_year              0                               WEDNESDAY
+                      futChPct_year              0                                THURSDAY
+                      futChPct_year              0                                  FRIDAY
+
+                               yVar     ave      n  pctGt0  pctGt1        ave*n     period
+                      futChPct_week *  1.60 *  369 *    67 *    55 *     590.33 *      all
+                      futChPct_year   17.89      2     100     100        35.77        all
+1.794 seconds
+
+
+shorting strategy:
+priceChPct_day >= 8; PFCF <= 0; PB >= 0; priceChPct_day >= 2; priceChPct_week >= 2; priceChPct_month >= 4; priceChPct_2month >= 10; vol >= 100000; 
+                               yVar     ave      n  pctGt0  pctGt1        ave*n     period
+                      futChPct_week *       *    0 *       *       *            *     2004
+                      futChPct_week * -9.05 *    1 *     0 *     0 *      -9.05 *     2005
+                      futChPct_week * -2.52 *   11 *    27 *    27 *     -27.71 *     2006
+                      futChPct_week * -6.36 *   26 *    26 *    23 *    -165.36 *     2007
+                      futChPct_week * -3.57 *   45 *    26 *    24 *    -160.48 *     2008
+                      futChPct_week * -0.06 *   53 *    52 *    49 *      -3.11 *     2009
+                      futChPct_week * -0.86 *   37 *    48 *    45 *     -31.92 *     2010
+                      futChPct_week * -1.15 *   16 *    50 *    43 *     -18.42 *     2011
+                      futChPct_week * -0.70 *   24 *    33 *    33 *     -16.83 *     2012
+                      futChPct_week * -2.80 *   58 *    36 *    31 *    -162.54 *     2013
+                      futChPct_week * -2.16 *   97 *    38 *    34 *    -209.83 *     2014
+                      futChPct_week * -0.32 *   36 *    44 *    44 *     -11.38 *     2015
+                      futChPct_week * -2.56 *   73 *    35 *    32 *    -186.92 *   MONDAY
+                      futChPct_week * -0.71 *   74 *    45 *    44 *     -52.57 *  TUESDAY
+                      futChPct_week * -2.73 *   98 *    38 *    32 *    -267.35 *WEDNESDAY
+                      futChPct_week * -2.26 *   73 *    36 *    35 *    -165.33 * THURSDAY
+                      futChPct_week * -1.68 *   86 *    38 *    34 *    -144.47 *   FRIDAY
+                      futChPct_year              0                                    2004
+                      futChPct_year  -57.01      1       0       0       -57.01       2005
+                      futChPct_year   12.01     11      54      54       132.16       2006
+                      futChPct_year  -36.38     20      10      10      -727.67       2007
+                      futChPct_year  -25.72     45      22      20     -1157.32       2008
+                      futChPct_year   19.64     53      67      66      1040.91       2009
+                      futChPct_year   23.15     37      40      40       856.46       2010
+                      futChPct_year   -5.38     16      31      31       -86.10       2011
+                      futChPct_year   14.71     24      54      54       352.95       2012
+                      futChPct_year   14.96     56      44      44       837.86       2013
+                      futChPct_year    1.36     45      24      24        61.15       2014
+                      futChPct_year              0                                    2015
+                      futChPct_year   18.53     58      43      43      1074.87     MONDAY
+                      futChPct_year   -2.65     51      37      37      -134.95    TUESDAY
+                      futChPct_year    0.09     73      41      39         6.47  WEDNESDAY
+                      futChPct_year   -2.02     61      39      37      -123.42   THURSDAY
+                      futChPct_year    6.62     65      38      38       430.42     FRIDAY
+
+                               yVar     ave      n  pctGt0  pctGt1        ave*n     period
+                      futChPct_week * -2.02 *  404 *    39 *    35 *    -816.63 *      all
+                      futChPct_year    4.07    308      39      39      1253.39        all
+1.31 seconds
+
+using:
+priceChPct_day        $  >=  8 
+PFCF      		 	  $  <= 0   # $ <=  20   
+ys PB                     $  >= 0   
+ys priceChPct_day        $  >=  2     
+ys priceChPct_week       $  >=  2                 
+ys priceChPct_month      $  >=  4                       
+ys priceChPct_2month     $  >=  10                  
+vol     			  $  >=  100000  
+
+
+SI_numDaysSinceCookedDissemination == 2; PB >= 5; PE >= 6; PFCF >= 0; vol >= 100000; 
+                                                        __ABS__                  _________DAYS_________
+                yVar    ave        n     ad   g0 g1 gA   g2 g4   ave*n    nCo        n    ad   g0 g1 gA     period
+        futChPct_day   0.31     1431    1.3   55 25 45   18  4     442    124       27   0.6   74 19 52        all
+       futChPct_2day   0.52     1348    2.0   57 37 47   34 13     696    123       26   1.0   65 38 50        all
+       futChPct_week * 1.32 *   1347 *  3.1 * 64 51 47 * 52 25 *  1781 ** 123 *     26 * 1.6 * 73 50 50 *      all
+       futChPct_8day   1.46     1348    3.9   62 51 46   60 35    1970    123       26   2.0   65 50 50        all
+      futChPct_2week   1.43     1349    4.4   61 50 45   64 40    1932    123       26   2.7   58 42 42        all
+      futChPct_3week   2.16     1260    5.4   63 55 46   70 47    2725    121       24   3.1   67 54 42        all
+      futChPct_month * 2.58 *   1262 *  6.4 * 63 56 46 * 74 55 *  3262 ** 121 *     25 * 3.9 * 64 56 36 *      all
+     futChPct_2month   4.45     1098    9.0   66 61 48   84 69    4885    119       22   4.2   82 68 41        all
+     futChPct_6month   8.16      542   17.9   70 69 54   92 81    4423     81       13   7.2  100100 46        all
+0.702 seconds
+
+using 851 tickers from A to ZZZZZZZ. startingdate: 20140101. subset offset, fraction: (0, 5). excluding X's: null.  excluding catTypes: [GOOGLE_INDUSTRY, GOOGLE_SECTOR, GOOGLE_RELATED_COMPANIES, YAHOO_INDUSTRY]
+SI_numDaysUntilSettlement == 0; SI_recent_DaysToCover <= 2.5; PB <= 0; PFCF >= 0; vol >= 100000; 
+                                                        __ABS__                  _________DAYS_________
+                yVar    ave        n     ad   g0 g1 gA   g2 g4   ave*n    nCo        n    ad   g0 g1 gA     period
+        futChPct_day   0.51      103    2.5   52 32 42   42 18      52     22       23   1.6   61 43 48        all
+       futChPct_2day   0.83      103    3.2   54 41 44   51 22      86     22       23   2.2   65 48 48        all
+       futChPct_week * 2.37 *    103 *  5.6 * 60 50 42 * 72 50 *   244 **  22 *     23 * 3.4 * 70 61 48 *      all
+       futChPct_8day   2.38      103    6.6   59 51 47   77 56     246     22       23   3.9   65 65 61        all
+      futChPct_2week   1.84      103    7.2   60 53 44   76 58     189     22       23   4.5   70 57 57        all
+      futChPct_3week   3.25       99    8.4   59 51 45   81 60     321     21       22   5.2   73 68 55        all
+      futChPct_month * 2.85 *     99 * 10.2 * 53 52 39 * 86 70 *   282 **  21 *     22 * 5.8 * 64 55 45 *      all
+     futChPct_2month   3.92       93   12.6   59 56 48   90 78     365     21       20   5.9   65 65 45        all
+     futChPct_6month   4.76       49   26.9   71 69 65   94 90     233     13       11  10.3   64 64 45        all    0.541 seconds
+
+using 851 tickers from A to ZZZZZZZ. startingdate: 20140101. subset offset, fraction: (0, 5). excluding X's: null.  excluding catTypes: [GOOGLE_INDUSTRY, GOOGLE_SECTOR, GOOGLE_RELATED_COMPANIES, YAHOO_INDUSTRY]
+priceChPct_week >= 0; SI_numDaysUntilSettlement == 0; SI_recent_DaysToCover <= 2.5; PB <= 0; PFCF >= 0; vol >= 100000; 
+                                                        __ABS__                  _________DAYS_________
+                yVar    ave        n     ad   g0 g1 gA   g2 g4   ave*n    nCo        n    ad   g0 g1 gA     period
+        futChPct_day   0.43       53    2.6   55 34 45   43 21      23     16       22   2.2   59 36 41        all
+       futChPct_2day   1.12       53    3.4   60 47 47   51 25      59     16       22   3.1   64 45 45        all
+       futChPct_week * 3.41 *     53 *  6.2 * 64 57 40 * 72 51 *   181 **  16 *     22 * 5.0 * 73 64 32 *      all
+       futChPct_8day   3.77       53    6.7   66 55 42   75 55     200     16       22   5.7   73 64 41        all
+      futChPct_2week   3.53       53    7.2   68 62 45   72 55     187     16       22   5.6   64 64 50        all
+      futChPct_3week   5.05       52    8.2   69 58 37   77 65     263     16       21   6.2   81 76 48        all
+      futChPct_month * 4.99 *     52 * 11.0 * 62 62 46 * 85 62 *   260 **  16 *     21 * 8.8 * 67 67 52 *      all
+     futChPct_2month   6.38       49   12.6   63 61 47   86 82     313     16       19   9.1   74 74 58        all
+     futChPct_6month   9.05       28   24.4   79 75 61   93 82     253     10       10  16.9   70 70 60        all    0.483 seconds
+
+using 851 tickers from A to ZZZZZZZ. startingdate: 20140101. subset offset, fraction: (0, 5). excluding X's: null.  excluding catTypes: [GOOGLE_INDUSTRY, GOOGLE_SECTOR, GOOGLE_RELATED_COMPANIES, YAHOO_INDUSTRY]
+News_numTotalNonShittySources <= 1; Sec_NumReports >= 3; News_numPressReleases >= 1; vol >= 100000; 
+                                                        __ABS__                  _________DAYS_________
+                yVar    ave        n     ad   g0 g1 gA   g2 g4   ave*n    nCo        n    ad   g0 g1 gA     period
+        futChPct_day   0.55      109    1.6   56 32 39   24  8      60     97       63   1.6   57 37 44        all
+       futChPct_2day   1.11      109    2.6   62 44 43   40 15     121     97       63   2.4   62 46 44        all
+       futChPct_week * 1.54 *    109 *  3.8 * 67 58 52 * 60 32 *   168 **  97 *     63 * 3.6 * 70 59 56 *      all
+      futChPct_2week   1.94      101    5.4   64 56 52   70 42     196     89       59   4.9   63 56 53        all
+      futChPct_month * 3.36 *     92 *  6.8 * 68 62 45 * 70 51 *   309 **  81 *     53 * 6.0 * 68 60 40 *      all
+     futChPct_2month   3.50       55   10.8   65 60 47   85 73     192     51       35   9.4   66 60 46        all
+     futChPct_6month   1.49        6   21.4   50 50 50  100 83       9      6        6  21.4   50 50 50        all
+       futChPct_year               0    0.0                                 0        0                         all    0.467 seconds
+using 851 tickers from A to ZZZZZZZ. startingdate: 20140101. subset offset, fraction: (0, 5). excluding X's: null.  excluding catTypes: [GOOGLE_INDUSTRY, GOOGLE_SECTOR, GOOGLE_RELATED_COMPANIES, YAHOO_INDUSTRY]
+priceChPct_day <= -0.5; News_numTotalNonShittySources <= 1; Sec_NumReports >= 3; News_numPressReleases >= 1; vol >= 100000; 
+                                                        __ABS__                  _________DAYS_________
+                yVar    ave        n     ad   g0 g1 gA   g2 g4   ave*n    nCo        n    ad   g0 g1 gA     period
+        futChPct_day   0.55       34    1.7   65 38 47   24  9      19     33       26   1.7   65 38 50        all
+       futChPct_2day   1.16       34    2.7   71 50 47   41 21      40     33       26   2.5   77 54 50        all
+       futChPct_week * 2.27 *     34 *  3.2 * 76 65 56 * 62 32 *    77 **  33 *     26 * 3.0 * 81 62 54 *      all
+      futChPct_2week   1.84       33    4.5   70 52 48   67 36      61     32       25   3.9   68 52 48        all
+      futChPct_month * 3.15 *     25 *  7.3 * 68 56 40 * 76 52 *    79 **  25 *     20 * 7.6 * 70 50 40 *      all
+     futChPct_2month   3.17       15   10.9   60 60 40   73 73      48     15       12  11.0   58 58 42        all
+     futChPct_6month   0.25        3   25.5   33 33 33   67 67       1      3        3  25.5   33 33 33        all
+       futChPct_year               0    0.0                                 0        0                         all    0.521 seconds
+
+using 335 tickers from A to ZZZZ. startingdate: 20040101. subset offset, fraction: (0, 15). excluding X's: [class objects.splits.X, class objects.finance.X, class objects.people.X, class objects.short_interest.X].  excluding catTypes: [GOOGLE_INDUSTRY, GOOGLE_SECTOR, GOOGLE_RELATED_COMPANIES, YAHOO_INDUSTRY]
+priceChPct_day >= 0; Earnings_numDaysUntil == 1; vol >= 100000; ys cer_priceChPct >= 2; ys cer_n >= 4; 
+                                                        __ABS__                  _________DAYS_________
+                yVar    ave        n     ad   g0 g1 gA   g2 g4   ave*n    nCo        n    ad   g0 g1 gA     period
+        futChPct_day  -1.38      368    5.9   43 34 55   70 47    -509    154      249   5.2   41 33 54        all
+       futChPct_2day  -1.89      368    6.6   39 32 53   71 52    -695    154      249   6.1   38 30 51        all
+       futChPct_week *-2.35 *    368 *  7.8 * 38 36 52 * 78 60 *  -863 ** 154 *    249 * 7.5 * 39 35 49 *      all
+      futChPct_2week  -2.50      368    8.9   40 36 52   84 64    -919    154      249   8.3   39 36 51        all
+      futChPct_month *-1.76 *    366 * 10.7 * 46 45 51 * 86 73 *  -645 ** 153 *    247 *10.1 * 48 44 53 *      all
+     futChPct_2month   0.66      363   13.1   52 49 50   92 77     241    152      245  12.3   53 51 52        all
+     futChPct_6month   7.10      344   25.5   58 56 50   93 87    2443    147      232  24.3   57 56 50        all
+       futChPct_year  19.69      339   39.3   63 62 43   95 92    6674    144      229  37.9   63 61 45        all    2.356 seconds
+using:
+priceChPct_day        $  >=  0
+Earnings_numDaysUntil			$ == 1
+Ys cer_priceChPct				$ >= 2
+Ys cer_n                        $  >=  4  # $  <=  3    # comments               	#adding this restriction leads to a HIGHER n :(  wrong.  TODO must fix     
+vol     			  $  >=  100000 
+
+interesting filters so far:
+
+#this is amazing:
+# priceChPct_week       $  >=  0  
+# SI_numDaysSinceSettlement			$ == 0
+# SI_recent_DaysToCover			$ <= 2.5
+# PB      			 $  <= 0         # $  >=  0#     
+# PFCF      		 	  $  >= 0   # $ <=  20        
+
+#amazing news-based            
+# priceChPct_day        $  <=  -.5
+# News_numTotalNonShittySources		$ <= 1
+# Sec_NumReports						$ >= 3
+# News_numPressReleases				$ >= 1
+
+#amazing CER-based.  contrarian?
+# priceChPct_day        $  >=  0
+# Earnings_numDaysUntil			$ == 1
+# Ys cer_priceChPct				$ >= 2
+# Ys cer_n                        $  >=  4  # $  <=  3    # comments               	#adding this restriction leads to a HIGHER n :(  wrong.  TODO must fix     
+# vol     			  $  >=  100000 
+
+
+CER contrarian/short strategies:
+
+using 335 tickers from A to ZZZZ. startingdate: 20040101. subset offset, fraction: (0, 15). excluding X's: [class objects.splits.X, class objects.finance.X, class objects.people.X, class objects.short_interest.X].  excluding catTypes: [GOOGLE_INDUSTRY, GOOGLE_SECTOR, GOOGLE_RELATED_COMPANIES, YAHOO_INDUSTRY]
+priceChPct_day >= 0; Earnings_numDaysUntil == 1; vol >= 100000; ys cer_priceChPct >= 2; ys cer_n >= 4; 
+                                                        __ABS__                  _________DAYS_________
+                yVar    ave        n     ad   g0 g1 gA   g2 g4   ave*n    nCo        n    ad   g0 g1 gA     period
+        futChPct_day  -1.38      368    5.9   43 34 55   70 47    -509    154      249   5.2   41 33 54        all
+       futChPct_2day  -1.89      368    6.6   39 32 53   71 52    -695    154      249   6.1   38 30 51        all
+       futChPct_week *-2.35 *    368 *  7.8 * 38 36 52 * 78 60 *  -863 ** 154 *    249 * 7.5 * 39 35 49 *      all
+      futChPct_2week  -2.50      368    8.9   40 36 52   84 64    -919    154      249   8.3   39 36 51        all
+      futChPct_month *-1.76 *    366 * 10.7 * 46 45 51 * 86 73 *  -645 ** 153 *    247 *10.1 * 48 44 53 *      all
+     futChPct_2month   0.66      363   13.1   52 49 50   92 77     241    152      245  12.3   53 51 52        all
+     futChPct_6month   7.10      344   25.5   58 56 50   93 87    2443    147      232  24.3   57 56 50        all
+       futChPct_year  19.69      339   39.3   63 62 43   95 92    6674    144      229  37.9   63 61 45        all    2.356 seconds
+using 335 tickers from A to ZZZZ. startingdate: 20040101. subset offset, fraction: (0, 15). excluding X's: [class objects.splits.X, class objects.finance.X, class objects.people.X, class objects.short_interest.X].  excluding catTypes: [GOOGLE_INDUSTRY, GOOGLE_SECTOR, GOOGLE_RELATED_COMPANIES, YAHOO_INDUSTRY]
+Earnings_numDaysUntil == 1; vol >= 100000; cer_pctGt2 >= 0.55; ys cer_n >= 4; 
+                                                        __ABS__                  _________DAYS_________
+                yVar    ave        n     ad   g0 g1 gA   g2 g4   ave*n    nCo        n    ad   g0 g1 gA     period
+        futChPct_day  -1.21      445    5.5   42 33 53   69 47    -539    150      255   4.6   38 30 52        all
+       futChPct_2day  -1.61      445    6.4   41 33 53   73 54    -716    150      255   5.7   38 30 51        all
+       futChPct_week *-1.66 *    445 *  7.9 * 42 38 50 * 79 62 *  -737 ** 150 *    255 * 7.2 * 38 35 46 *      all
+      futChPct_2week  -1.94      445    9.5   45 40 52   87 67    -864    150      255   8.7   44 41 51        all
+      futChPct_month *-1.52 *    444 * 11.4 * 48 45 51 * 88 75 *  -673 ** 150 *    254 *10.6 * 47 44 51 *      all
+     futChPct_2month   1.13      438   14.3   53 50 50   90 78     494    147      249  13.1   53 49 49        all
+     futChPct_6month   7.52      387   28.3   55 53 47   92 88    2911    136      228  25.5   57 56 51        all
+       futChPct_year  17.57      373   42.6   58 58 43   95 92    6555    134      222  41.7   59 59 45        all    2.403 seconds
+
+
+##################################################################  tested on a couple subsets.  good ave gt's and days, etc.
+# vol     			  $  >=  1000000  
+# m_VTI_priceChPct_day $ <= .5
+# m_VTI_priceChPct_week $ <= 0
+# m_VTI_ema3m5 $ <= -.1
+# AG_3                  $  <= .5                 
+# ema3m5                $  <=  .1
+# ema3m9                $  <=  -.1               
+ # priceChPct_day        $   <= -.5
+# priceChPct_week       $  <=  -2                 
+# priceChPct_month      $  <=  -4               
+# priceChPct_2month     $  <=  -8 
+
+###################################################################
+# vol     			  $  >=  1000000  
+# m_VTI_priceChPct_day $ >= .5
+# m_VTI_priceChPct_week $ >= .5
+# m_VTI_ema3m5 $ >= .1
+# AG_3                  $  >= 1                 
+# ema3m5                $  >=  .1
+# ema3m9                $  >=  -.1               
+ # priceChPct_day        $   >= 10
+# priceChPct_week       $  >=  2                 
+# priceChPct_month      $  >=  2               
+# priceChPct_2month     $  >=  2 
+
+######################################################################	april 29 2015
+# vol     			  $  >=  1000000  
+# m_VTI_priceChPct_day $ <= .5
+# m_VTI_priceChPct_week $ <= 0
+# m_VTI_ema3m5 $ <= -.1
+# AG_3                  $  <= .5                 
+# ema3m5                $  <=  .1
+# ema3m9                $  <=  -.1               
+# priceChPct_day        $   <= -.5
+# priceChPct_week       $  <=  -2                 
+# priceChPct_month      $  <=  -4               
+# priceChPct_2month     $  <=  -8 
+# Earnings_numDaysUntil			$ >= 5
+# Earnings_numDaysSince			$ >= 1
+# m_date $ >= 20010101
+# volVsAvVol					$ <= -10
+
+################################################################### april 29 slightly better
+# vol     			  		$  >=  100000  	# even better with higher volume restriction
+# m_VTI_priceChPct_day  		$ <= .5
+# m_VTI_priceChPct_week 		$ <= 0
+# m_VTI_ema3m5 		  		$ <= -.1
+# AG_3                 		 $  <= .5                 
+# ema3m5               		 $  <=  .1
+# ema3m9               		 $  <=  -.1               
+# priceChPct_day       		 $   <= -.5
+# priceChPct_week      		 $  <=  -2                 
+# priceChPct_month     		 $  <=  -2               
+# priceChPct_2month    		 $  <=  -4 
+# Earnings_numDaysUntil		 $ >= 5
+# Earnings_numDaysSince		 $ >= 1
+# m_date 						$  >= 20010101
+
+################################################################## best for week buy.  prefer stocks with lower prices (greater than 2 or 3 preferably)! and higher volumes! (bigger the better)
+# vol     			  		$  >=  100000  
+# m_VTI_priceChPct_day  		$ <= .5
+# m_VTI_priceChPct_week 		$ <= 0
+# m_VTI_ema3m5 		  		$ <= -.1
+# AG_3                 		 $  <= .5                 
+# ema3m5               		 $  <=  .1
+# ema3m9               		 $  <=  -.1               
+# priceChPct_day       		 $   <= -2
+# priceChPct_week      		 $  <=  -2                 
+# priceChPct_month     		 $  <=  -2               
+# priceChPct_2month    		 $  <=  -4 
+# Earnings_numDaysSince		 $ >= 1							
+## grc PFCF									$ >= 0			# added later, also:
+## PB      			 $  >= -1    #      $  >=  0#   		# maybe
+## grc PB									$ <= 0			# maybe
+## PE      			  $ >= -1 
+
+############################################################  very restrictive.  great 1 day return.
+# vol     			  		$  >=  100000  
+## m_VTI_priceChPct_day  		$ <= -.5
+## m_VTI_priceChPct_week 		$ <= 0
+## m_VTI_ema3m5 		  		$ <= -.2
+# AG_3                 		 $  <= 0                 
+# ema3m5               		 $  <=  -.1
+# ema3m9               		 $  <=  -.1               
+# priceChPct_day       		 $   <= -10
+# priceChPct_week      		 $  <=  -7                 
+# priceChPct_month     		 $  <=  -7               
+# priceChPct_2month    		 $  <=  -4 
+# Earnings_numDaysSince		 $ >= 1				
+# grc PB						$ <= 0			
+
+
+per exec: using 669 tickers, from A to ZZZZ, startingdate: 20040101. subset offset, fraction: (0, 7). using X's: [class objects.prices.X, class objects.earnings.X, class objects.finance.X, class objects.profile.X].  excluding catTypes: [GOOGLE_INDUSTRY, GOOGLE_SECTOR, YAHOO_INDUSTRY]
+per filt: R, keep top 5 daily, vol >= 100000; AG_3 <= 0.5; ema3m5 <= 0.1; ema3m9 <= -0.1; priceChPct_day <= -2; priceChPct_week <= -2; priceChPct_month <= -2; priceChPct_2month <= -4; Earnings_numDaysSince >= 1; m_VTI_priceChPct_day <= 0.5; m_VTI_priceChPct_week <= 0; m_VTI_ema3m5 <= -0.1; 
+.                                                            __ABS__            ________________DAYS________________
+                yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk     period   
+       futChPct_week *  1.94 *    151 *  4.1 * 25  66 54 41 * 30  6 **    293 **  1.92 *   32 *  2.6 * 13  72 56 44 *  75 *     *     2004   
+       futChPct_week *  0.98 *    167 *  4.1 * 35  55 48 48 * 28  8 **    163 **  0.99 *   38 *  2.7 * 29  68 53 53 *  92 *     *     2005   
+       futChPct_week *  1.16 *    120 *  4.5 * 37  57 55 54 * 35  8 **    139 **  1.36 *   26 *  2.7 * 23  65 62 58 *  69 *     *     2006   
+       futChPct_week *  0.88 *    204 *  4.2 * 30  59 52 52 * 33  5 **    179 **  0.87 *   41 *  3.4 * 34  61 51 51 *  88 *     *     2007   
+       futChPct_week *  3.00 *    309 * 11.5 * 40  56 51 44 * 62 36 **    927 **  3.01 *   62 *  9.3 * 37  61 56 50 *  74 *     *     2008   
+       futChPct_week *  2.47 *    220 * 12.2 * 37  60 56 51 * 65 41 **    543 **  2.61 *   45 * 10.0 * 31  67 60 53 *  90 *     *     2009   
+       futChPct_week *  1.35 *    246 *  4.7 * 29  62 56 52 * 35 11 **    332 **  1.31 *   50 *  3.7 * 20  66 54 50 * 105 *     *     2010   
+       futChPct_week *  1.01 *    308 *  6.2 * 38  56 50 50 * 44 23 **    311 **  0.94 *   63 *  5.0 * 37  57 48 48 * 106 *     *     2011   
+       futChPct_week * -0.19 *    233 *  5.4 * 41  53 45 55 * 42 13 **    -45 ** -0.11 *   50 *  4.1 * 46  48 44 48 *  91 *     *     2012   
+       futChPct_week *  1.06 *    142 *  4.9 * 30  60 50 50 * 34 13 **    151 **  1.22 *   30 *  3.3 * 30  63 57 57 *  89 *     *     2013   
+       futChPct_week *  2.20 *    205 *  6.1 * 32  58 48 40 * 40 17 **    451 **   2.2 *   41 *  4.8 * 37  56 56 41 *  97 *     *     2014   
+       futChPct_week *  1.23 *     75 *  5.4 * 36  57 51 47 * 35 17 **     92 **  1.23 *   15 *  4.0 * 33  67 53 47 *  46 *     *     2015   
+                                                            __ABS__            ________________DAYS________________
+                yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk     period   
+       futChPct_week *  1.49 *   2380 *  6.6 * 35  58 51 48 * 42 18 **   3536 **   1.5 *  493 *  5.0 * 32  62 54 49 * 324 *   4 *      all   2.402 seconds 
+
+
+
+############################################################## best weekly.  with volume rank daily cutoff:
+# 5 	# how many hits to keep per day.  the ones with the highest volume
+# vol     			  		$  >=  100000  
+# m_VTI_priceChPct_day  		$ <= .5
+# m_VTI_priceChPct_week 		$ <= 0
+# m_VTI_ema3m5 		  		$ <= -.1
+# AG_3                 		 $  <= .5                 
+# ema3m5               		 $  <=  .1
+# ema3m9               		 $  <=  -.1               
+# priceChPct_day       		 $   <= -2
+# priceChPct_week      		 $  <=  -2                 
+# priceChPct_month     		 $  <=  -2               
+# priceChPct_2month    		 $  <=  -4 
+# Earnings_numDaysSince		 $ >= 1							
+###grc PFCF									$ >= 0			# added later, also:
+###PB      			 $  >= -1    #      $  >=  0#   		# maybe
+###grc PB									$ <= 0			# maybe
+# PE      			  $ >= -1 
+-------------->
+per exec: using 669 tickers, from A to ZZZZ, startingdate: 20040101. subset offset, fraction: (0, 7). using X's: [class objects.prices.X, class objects.earnings.X, class objects.finance.X, class objects.profile.X].  excluding catTypes: [GOOGLE_INDUSTRY, GOOGLE_SECTOR, YAHOO_INDUSTRY]
+per filt: R, keep top 5 daily, vol >= 100000; AG_3 <= 0.5; ema3m5 <= 0.1; ema3m9 <= -0.1; priceChPct_day <= -2; priceChPct_week <= -2; priceChPct_month <= -2; priceChPct_2month <= -4; Earnings_numDaysSince >= 1; PE >= -1; m_VTI_priceChPct_day <= 0.5; m_VTI_priceChPct_week <= 0; m_VTI_ema3m5 <= -0.1; 
+.                                                            __ABS__            ________________DAYS________________
+                yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk     period   
+       futChPct_week *       *      0 *  0.0 *              *       **        **       *    0 *      *              *   0 *     *     2004   
+       futChPct_week *  1.55 *     32 *  3.9 * 34  63 59 44 * 19  6 **     49 **  1.41 *   16 *  3.2 * 25  69 44 25 *  18 *     *     2005   
+       futChPct_week *  1.25 *    120 *  4.3 * 33  58 54 53 * 27 10 **    150 **  1.45 *   26 *  2.6 * 27  69 58 54 *  70 *     *     2006   
+       futChPct_week *  0.87 *    201 *  4.1 * 30  61 54 54 * 33  5 **    175 **  0.89 *   41 *  3.0 * 29  71 56 56 *  88 *     *     2007   
+       futChPct_week *  3.60 *    306 * 11.4 * 39  57 52 41 * 61 37 **   1103 **   3.6 *   62 *  9.2 * 34  61 58 40 *  73 *     *     2008   
+       futChPct_week *  3.63 *    217 * 10.6 * 35  61 58 47 * 61 36 **    789 **  3.77 *   45 *  8.1 * 29  67 67 56 *  89 *     *     2009   
+       futChPct_week *  1.46 *    235 *  4.7 * 33  60 54 50 * 40  8 **    342 **  1.43 *   50 *  3.6 * 28  64 58 54 *  93 *     *     2010   
+       futChPct_week *  1.46 *    301 *  5.7 * 38  56 50 46 * 44 18 **    440 **  1.46 *   63 *  4.6 * 35  59 52 44 * 104 *     *     2011   
+       futChPct_week *  0.67 *    210 *  4.4 * 36  57 49 54 * 35  9 **    141 **  0.51 *   49 *  3.7 * 39  59 57 59 *  89 *     *     2012   
+       futChPct_week *  1.26 *    130 *  4.4 * 26  64 53 52 * 32  8 **    164 **  1.34 *   29 *  2.5 * 21  69 59 52 *  80 *     *     2013   
+       futChPct_week *  2.69 *    201 *  5.6 * 28  61 52 39 * 38 15 **    540 **   2.6 *   41 *  4.2 * 29  61 59 39 * 105 *     *     2014   
+       futChPct_week *  1.82 *     74 *  4.7 * 26  65 62 53 * 27 11 **    135 **  1.81 *   15 *  3.7 * 20  80 73 47 *  50 *     *     2015   
+                                                            __ABS__            ________________DAYS________________
+                yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk     period   
+       futChPct_week *  1.99 *   2027 *  6.4 * 34  59 53 46 * 42 17 **   4028 **  1.95 *  437 *  4.9 * 30  64 58 43 * 307 *   3 *      all   2.446 seconds 
+
+
+
+
+
+0, 0	# subset by date info!  (offset, fraction denominator).  eg, it loops through dates and only keeps those where (count + offset) % fractionDenominator == 0.
+0, 0	# subset by company info!  (offset, fraction denominator).  eg, it loops through dates and only keeps those where (count + offset) % fractionDenominator == 0.
+all_tickers #AFQ #	list specific tickers separated by commas, or "all_tickers"
+yes #print hits to a file?
+research #"production" will tell you today's picks!  takes longer.  use research if not getting todays picks
+-1,   2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 #,  1995, 1996, 1997, 1998, 1999, 2000,2015,  Mon, Tues, Wed, Thurs, Fri  # ,  2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 #,  2014, 2015, #2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, #  Mon, Tues, Wed, Thurs, Fri 
+futChPct_week, #futChPct_2week,  futChPct_month, futChPct_2month, futChPct_6month, futChPct_year, #   futChPct_week ,  futChPct_2week,  futChPct_month,  futChPct_year # futChPct_2week,  futChPct_month, futChPct_2month, futChPct_6month,  futChPct_day, futChPct_2day, futChPct_8day,  futChPct_2week, futChPct_month,futChPct_day, futChPct_2day, futChPct_week,   futChPct_8day, futChPct_2week, futChPct_3week, futChPct_month, futChPct_2month, futChPct_6month #,  futChPct_year #futChPct_intraDay, futChPct_day, futChPct_2day, 
+10 	# how many hits to keep per day. 
+priceChPct_day		# hits ranking var
+true	# sort ranking variable Increasing (false for decreasing)!  it keeps the first ones
+5, 1, 10000, 5, preferCash, no_allow_doubledowns, true  # numStocks, init$, minDays, preferCash vs. preferStock, can buy more of owned stock, use fees? #max porftolio size, max allocation, minimum hold time (days), holding mode (preferCash vs preferStock), allow purchase of already-held stock? (yes_allow_doubledowns).  will simulate portfolio if portfolio size > 0
+PE		# portfolio ranking var
+true	# sort portfolio variable Increasing (false for decreasing)!  it keeps the first ones
+
+vol     			  		$  >=  100000  
+priceChPct_week      		 $  <=  -1              
+Earnings_numDaysSince		 $ >= 1		
+PE      			  $ >= 0 
+grc PFCF									$ >= 0			# added later, also:
+
+RESULTS:
+
+
+per exec: using 437 tickers, from A to ZZZZ, startingdate: 20040101. subset offset, fraction: (0, 10). using X's: [class objects.prices.X, class objects.earnings.X, class objects.finance.X, class objects.profile.X].  excluding catTypes: [GOOGLE_INDUSTRY, GOOGLE_SECTOR, YAHOO_INDUSTRY]
+per filt: R, rank by priceChPct_day increasing, keep 1st 10 daily, vol >= 100000; priceChPct_week <= -1; Earnings_numDaysSince >= 1; PE >= 0; PFCF >= 0; 
+prtfolio: maxStocks: 5, maxDailyBuys: 1, rank by PE increasing, init$: 10000, minDays: 5, preferCash: true, allowDD: false, useFees?: true.
+.                                               __ABS__             _______________DAYS________________                   __________________PORTFOLIO_________________
+  yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk   span     n days       %      min$    max$    fin$  
+  week *       *      0 *  0.0 *              *       **        **       *    0 *      *              *   0 *     * 2004     0    0 *   0.0 *   10000   10000   10000  
+  week *  1.30 *    827 *  3.8 * 32  55 46 44 * 24  6 **   1079 **   1.5 *  192 *  3.1 * 27  60 48 47 *  30 *     * 2005   146  146 *  43.1 *    9838   14308   14308  
+  week *  0.57 *   2492 *  3.8 * 35  54 45 49 * 26  5 **   1409 **  0.55 *  251 *  2.3 * 30  58 45 49 * 149 *     * 2006   245  245 *  37.3 *   10000   14548   13731  
+  week *  0.45 *   2438 *  3.9 * 38  53 44 49 * 27  7 **   1108 **  0.45 *  251 *  2.3 * 26  61 46 54 * 141 *     * 2007   245  245 *  14.2 *    9558   12413   11420  
+  week *  0.20 *   2496 *  8.0 * 44  50 45 49 * 52 26 **    492 **  0.17 *  252 *  5.6 * 41  52 44 50 * 151 *     * 2008   246  246 * -46.5 *    4066   11271    5345  
+  week *  1.32 *   2349 *  6.2 * 38  56 49 47 * 44 16 **   3090 **  1.27 *  252 *  4.2 * 35  59 50 46 * 128 *     * 2009   246  246 * 159.6 *    6352   25964   25964  
+  week *  0.81 *   2359 *  3.9 * 34  57 48 50 * 29  6 **   1900 **  0.73 *  252 *  2.5 * 27  66 53 55 * 136 *     * 2010   245  245 *  14.0 *    9085   12518   11395  
+  week *  0.42 *   2306 *  4.9 * 39  52 44 49 * 37 12 **    970 **  0.36 *  250 *  3.6 * 34  52 42 47 * 158 *     * 2011   243  243 *  13.4 *    8411   11768   11336  
+  week *  0.60 *   2425 *  3.6 * 36  55 44 48 * 24  5 **   1456 **   0.6 *  250 *  2.1 * 27  59 45 49 * 149 *     * 2012   244  244 *  39.9 *    9982   14285   13988  
+  week *  1.03 *   2417 *  3.6 * 31  59 48 47 * 22  5 **   2494 **  1.06 *  252 *  1.9 * 19  66 53 50 * 172 *     * 2013   246  246 *  30.3 *    9900   13453   13028  
+  week *  0.30 *   2468 *  3.8 * 35  55 44 51 * 25  7 **    745 **  0.27 *  252 *  2.1 * 31  56 39 51 * 231 *     * 2014   246  246 *  35.0 *    9907   15830   13503  
+  week *  0.80 *    770 *  3.5 * 32  58 46 48 * 22  6 **    613 **   0.8 *   77 *  1.9 * 23  62 45 48 * 165 *     * 2015    76   76 *  13.5 *    9599   11345   11345  
+                                               __ABS__             _______________DAYS________________                   __________________PORTFOLIO_________________
+  yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk   span     n days       %      min$    max$    fin$  
+  week *  0.66 *  23347 *  4.6 * 37  55 46 49 * 31 10 **  15356 **  0.68 * 2531 *  2.9 * 29  59 47 50 * 318 *  39 *  all  2488 2488 *2101.0 *    9631  220099  220099  2.45s
+-------------------------------------------------------------
+
+-1,   2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 #,  1995, 1996, 1997, 1998, 1999, 2000,2015,  Mon, Tues, Wed, Thurs, Fri  # ,  2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 #,  2014, 2015, #2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, #  Mon, Tues, Wed, Thurs, Fri 
+futChPct_week, #futChPct_2week,  futChPct_month, futChPct_2month, futChPct_6month, futChPct_year, #   futChPct_week ,  futChPct_2week,  futChPct_month,  futChPct_year # futChPct_2week,  futChPct_month, futChPct_2month, futChPct_6month,  futChPct_day, futChPct_2day, futChPct_8day,  futChPct_2week, futChPct_month,futChPct_day, futChPct_2day, futChPct_week,   futChPct_8day, futChPct_2week, futChPct_3week, futChPct_month, futChPct_2month, futChPct_6month #,  futChPct_year #futChPct_intraDay, futChPct_day, futChPct_2day, 
+10 	# how many hits to keep per day. 
+priceChPct_day		# hits ranking var
+true	# sort ranking variable Increasing (false for decreasing)!  it keeps the first ones
+5, 1, 10000, 5, preferCash, no_allow_doubledowns, true  # numStocks, init$, minDays, preferCash vs. preferStock, can buy more of owned stock, use fees? #max porftolio size, max allocation, minimum hold time (days), holding mode (preferCash vs preferStock), allow purchase of already-held stock? (yes_allow_doubledowns).  will simulate portfolio if portfolio size > 0
+PE		# portfolio ranking var
+true	# sort portfolio variable Increasing (false for decreasing)!  it keeps the first ones
+vol     			  		$  >=  100000  
+m_VTI_priceChPct_day  		$ <= 3
+m_VTI_ema3m5 		  		$ <= .4
+priceChPct_week      		 $  <=  -1              
+Earnings_numDaysSince		 $ >= 1		
+PE      			  $ >= -3 
+grc PFCF									$ >= 0		
+
+results: 
+
+per filt: R, rank by priceChPct_day increasing, keep 1st 10 daily, vol >= 100000; priceChPct_week <= -1; Earnings_numDaysSince >= 1; PE >= -3; PFCF >= 0; m_VTI_priceChPct_day <= 3; m_VTI_ema3m5 <= 0.4; 
+prtfolio: maxStocks: 5, maxDailyBuys: 1, rank by PE increasing, init$: 10000, minDays: 5, preferCash: true, allowDD: false, useFees?: true.
+.                                               __ABS__             _______________DAYS________________                   __________________PORTFOLIO_________________
+  yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk   span     n days       %      min$    max$    fin$  
+  week *       *      0 *  0.0 *              *       **        **       *    0 *      *              *   0 *     * 2004     0    0 *   0.0 *   10000   10000   10000  
+  week *  1.25 *    876 *  3.8 * 33  55 46 44 * 25  6 **   1094 **  1.52 *  192 *  3.2 * 27  59 50 48 *  31 *     * 2005   148  148 *  35.5 *    9838   13677   13551  
+  week *  0.56 *   2492 *  3.8 * 35  54 45 49 * 26  5 **   1401 **  0.55 *  251 *  2.3 * 30  57 45 49 * 150 *     * 2006   245  245 *  38.5 *   10000   14635   13851  
+  week *  0.45 *   2422 *  3.9 * 38  53 44 49 * 27  7 **   1084 **  0.44 *  249 *  2.3 * 26  61 46 54 * 141 *     * 2007   243  243 *  11.8 *    9558   12413   11179  
+  week *  0.93 *   2039 *  8.1 * 42  53 47 48 * 52 27 **   1906 **  0.92 *  205 *  5.6 * 37  56 49 49 * 154 *     * 2008   199  199 *  21.2 *    8453   13954   12118  
+  week *  1.32 *   2210 *  6.5 * 38  56 49 48 * 45 18 **   2925 **  1.26 *  233 *  4.6 * 34  57 50 48 * 143 *     * 2009   227  227 * 117.5 *    6009   21790   21745  
+  week *  0.77 *   2350 *  4.1 * 35  56 47 50 * 30  7 **   1809 **   0.7 *  247 *  2.6 * 26  65 51 54 * 145 *     * 2010   240  240 *  21.9 *    9911   13310   12189  
+  week *  0.46 *   2206 *  5.1 * 39  52 44 48 * 38 13 **   1008 **  0.37 *  228 *  3.7 * 33  52 41 47 * 165 *     * 2011   222  222 *  24.7 *    9548   12804   12466  
+  week *  0.59 *   2422 *  3.6 * 36  55 44 49 * 24  5 **   1425 **  0.59 *  249 *  2.1 * 27  59 45 49 * 152 *     * 2012   243  243 *  42.4 *    9982   14503   14243  
+  week *  0.96 *   2364 *  3.6 * 32  58 47 47 * 22  5 **   2280 **     1 *  243 *  1.9 * 19  65 50 51 * 180 *     * 2013   237  237 *   1.1 *    8734   10689   10106  
+  week *  0.19 *   2279 *  3.9 * 37  53 42 51 * 26  7 **    428 **  0.16 *  231 *  2.2 * 32  55 39 52 * 236 *     * 2014   228  228 *   4.6 *    9495   14364   10460  
+  week *  0.96 *    750 *  3.8 * 33  57 46 47 * 24  7 **    717 **  0.96 *   75 *  2.0 * 24  65 49 51 * 168 *     * 2015    74   74 *  38.9 *    9300   13885   13885  
+                                               __ABS__             _______________DAYS________________                   __________________PORTFOLIO_________________
+  yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk   span     n days       %      min$    max$    fin$  
+  week *  0.72 *  22410 *  4.6 * 36  55 46 48 * 31 10 **  16077 **  0.74 * 2403 *  3.0 * 29  59 47 50 * 324 *  38 *  all  2363 2363 *2904.5 *    9838  300447  300447  2.32s
+
+
+
+
+-1,   2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 #,  1995, 1996, 1997, 1998, 1999, 2000,2015,  Mon, Tues, Wed, Thurs, Fri  # ,  2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 #,  2014, 2015, #2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, #  Mon, Tues, Wed, Thurs, Fri 
+futChPct_week, #futChPct_2week,  futChPct_month, futChPct_2month, futChPct_6month, futChPct_year, #   futChPct_week ,  futChPct_2week,  futChPct_month,  futChPct_year # futChPct_2week,  futChPct_month, futChPct_2month, futChPct_6month,  futChPct_day, futChPct_2day, futChPct_8day,  futChPct_2week, futChPct_month,futChPct_day, futChPct_2day, futChPct_week,   futChPct_8day, futChPct_2week, futChPct_3week, futChPct_month, futChPct_2month, futChPct_6month #,  futChPct_year #futChPct_intraDay, futChPct_day, futChPct_2day, 
+10, priceChPct_day, increasing			# Rank1 stuff - numKeep, var, increasing/decreasing
+5, PE, increasing							# Rank2 stuff - numKeep, var, increasing/decreasing
+5, 1, 10000, 5, preferCash, no_allow_doubledowns, true  # maxStocks, maxPerDay, init$, minDays, preferCash vs. preferStock, can buy more of owned stock, use fees? #max porftolio size, max allocation, minimum hold time (days), holding mode (preferCash vs preferStock), allow purchase of already-held stock? (yes_allow_doubledowns).  will simulate portfolio if portfolio size > 0
+vol     			  		$  >=  100000  
+m_VTI_priceChPct_day  		$ <= 3
+# m_VTI_priceChPct_week 		$ <= 0
+m_VTI_ema3m5 		  		$ <= 0.4
+AG_3                 		 $  <= .4                 
+# ema3m5               		 $  <=  .2
+ema3m9               		 $  <=  .2               
+# priceChPct_day       		 $   <= -2
+priceChPct_week      		 $  <=  -1                 
+# priceChPct_month     		 $  <=  -2               
+# priceChPct_2month    		 $  <=  -4 
+Earnings_numDaysSince		 $ >= 2			
+PE      			 		 $ >= -3 				
+grc PFCF					$ >= 0			# added later, also:
+
+results:
+per exec: using 437 tickers, from A to ZZZZ, startingdate: 20040101. subset offset, fraction: (0, 10). using X's: [class objects.prices.X, class objects.earnings.X, class objects.finance.X, class objects.profile.X].  excluding catTypes: [GOOGLE_INDUSTRY, GOOGLE_SECTOR, YAHOO_INDUSTRY]
+per filt: R, rank1: 10 priceChPct_day increasing, rank2: 5 PE increasing, vol >= 100000; AG_3 <= 0.4; ema3m9 <= 0.2; priceChPct_week <= -1; Earnings_numDaysSince >= 2; PE >= -3; PFCF >= 0; m_VTI_priceChPct_day <= 3; m_VTI_ema3m5 <= 0.4; 
+prtfolio: [5, 1, 10000, 5, true, false, true] (maxStocks, perDay, init$, minHoldDays, sellASAP?, allowDD?, useFees?).
+.                                               __ABS__             _______________DAYS________________                   __________________PORTFOLIO_________________
+  yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk   span     n days       %     min$    max$    fin$  
+  week *       *      0 *  0.0 *              *       **        **       *    0 *      *              *   0 *     * 2004     0    0 *   0.0 *  10000   10000   10000  
+  week *  1.25 *    623 *  3.9 * 35  53 44 42 * 26  6 **    780 **  1.53 *  191 *  3.2 * 29  59 51 47 *  30 *     * 2005   149  149 *  46.2 *   9838   14629   14624  
+  week *  0.56 *   1254 *  3.4 * 35  54 44 49 * 21  5 **    697 **  0.56 *  251 *  2.2 * 27  59 42 47 * 125 *     * 2006   245  245 *  31.1 *   9859   13767   13114  
+  week *  0.36 *   1236 *  3.6 * 38  51 41 48 * 24  5 **    439 **  0.36 *  249 *  2.4 * 30  56 43 51 * 122 *     * 2007   243  243 *   6.6 *   9603   12155   10664  
+  week *  1.19 *   1025 *  8.2 * 41  53 48 47 * 50 26 **   1223 **  1.19 *  205 *  6.3 * 33  59 52 50 * 127 *     * 2008   199  199 *  39.4 *   8914   15430   13935  
+  week *  1.49 *   1143 *  6.9 * 39  55 49 47 * 49 21 **   1703 **  1.46 *  233 *  5.1 * 36  58 52 48 * 114 *     * 2009   227  227 * 119.3 *   6178   22203   21934  
+  week *  0.67 *   1212 *  4.1 * 37  55 46 49 * 30  7 **    818 **  0.63 *  247 *  2.9 * 30  62 49 54 * 118 *     * 2010   240  240 *  22.5 *   9911   13405   12254  
+  week *  0.50 *   1123 *  5.1 * 39  52 44 47 * 37 13 **    566 **  0.44 *  228 *  3.8 * 34  54 42 48 * 129 *     * 2011   221  221 *  28.4 *  10000   13380   12838  
+  week *  0.67 *   1233 *  3.5 * 36  55 44 48 * 23  5 **    831 **  0.67 *  249 *  2.3 * 26  61 45 52 * 135 *     * 2012   243  243 *  35.4 *   9749   13706   13540  
+  week *  0.87 *   1203 *  3.1 * 30  58 46 48 * 19  3 **   1042 **  0.89 *  243 *  2.0 * 22  63 47 49 * 143 *     * 2013   237  237 *  28.7 *   9820   13144   12868  
+  week *  0.40 *   1150 *  4.1 * 36  55 44 50 * 27  8 **    462 **  0.39 *  231 *  2.7 * 33  56 44 51 * 173 *     * 2014   228  228 *  17.1 *   9568   14828   11706  
+  week *  1.28 *    375 *  4.0 * 32  58 47 45 * 24  7 **    479 **  1.28 *   75 *  2.5 * 29  65 53 52 *  99 *     * 2015    74   74 *  46.9 *   9300   14690   14690  
+                                               __ABS__             _______________DAYS________________                   __________________PORTFOLIO_________________
+  yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk   span     n days       %     min$    max$    fin$  
+  week *  0.78 *  11577 *  4.5 * 36  54 45 47 * 30 10 **   9040 **   0.8 * 2402 *  3.2 * 30  59 47 50 * 296 *  20 *  all  2363 2363 *5128.7 *   9838  522869  522869  2.06s
+
+testing:
+10, priceChPct_day, increasing			# Rank1 stuff - numKeep, var, increasing/decreasing
+n10, priceChPct_week, increasing							# Rank2 stuff - numKeep, var, increasing/decreasing
+12, 2, 100000, 6, doSellASAP, canReBuy, doUseFees, doUseSellDates  # maxStocks, maxPerDay, init$, minDays, doSellASAP/holdALAP, canrebuy/cant, useFees?, sellOnValidSellDatesOnly? ### #max porftolio size, max allocation, minimum hold time (days), holding mode (preferCash vs preferStock), allow purchase of already-held stock? (yes_allow_doubledowns).  will simulate portfolio if portfolio size > 0
+
+vol     			  		$  >=  1000000  #	$  <=  10000000  
+ Sec_NumReports                  $  <= 0
+<sell>m_VTI_priceChPct_day  		$ >= -.9			# between 0 and .3
+m_VTI_priceChPct_day  		$ <= -0.25				# between 0 and -.5
+
+ # Sec_TypesReported       		$   !contains   CT  #$   !contains   15 #   $   !contains   R $ !contains   11  $   !contains   PRE  $   !contains   UPLOAD  $   !contains   15 $   !contains   0  $   !contains CT ORDER   $   !contains 10 #$   !contains 8   #  $   !contains -  $   !contains /     
+ # Sec_TypesReported       		$   !contains   F $   !contains   6   $   !contains   R $ !contains   11  $   !contains   PRE  $   !contains   UPLOAD  $   !contains   15 $   !contains   0  $   !contains CT ORDER   $   !contains 10 #$   !contains 8   #  $   !contains -  $   !contains /     
+# m_VTI_priceChPct_day  		$ <= .5
+# m_VTI_priceChPct_week 		$ <= -10000
+# m_VTI_ema3m5 		  		$ <= -2
+
+# m_VTI_priceChPct_day  		$ <= 3
+# m_VTI_ema3m5 		  		$ <= 0.4
+close						$ >= 5
+
+AG_3                 		 $  <= .4                 
+ema3m5               		 $  <=  .1            
+# ema3m9               		 $  <=  0               
+# grc priceChPct_day      		 $  <=  5              
+# priceChPct_week      		 $  <=  3      
+# priceChPct_month      		 $  <=  0                 
+# Earnings_numDaysUntil		 $ <= 6			              
+Earnings_numDaysSince		 $ >= 2			
+PE      			 		 $ >= -3 #$ <= 100				
+PFCF					$ <= 40 	 $ >= -40 		# added later, also:
+grc PFCF					$ >= -1			# added later, also:
+
+per exec: using 1125 tickers, from A to ZZZZ, startingdate: 20040101. subset offset, fraction: (1, 4). using X's: [class objects.prices.X, class objects.earnings.X, class objects.finance.X, class objects.sec.X, class objects.profile.X].  excluding catTypes: [GOOGLE_INDUSTRY, GOOGLE_SECTOR, YAHOO_INDUSTRY, YAHOO_SECTOR]
+per filt: R, rank1: 10 priceChPct_day increasing, vol >= 1000000; Sec_NumReports <= 0; close >= 5; AG_3 <= 0.4; ema3m5 <= 0.1; Earnings_numDaysSince >= 2; PE >= -3; PFCF <= 40 AND >= -40; rc PFCF >= -1; m_VTI_priceChPct_day <= -0.25; 
+prtfolio: [14, 2, 100000, 7, true, true, true, true] (maxStocks, perDay, init$, minHoldDays, sellASAP?, allowDD?, useFees?, onlySellOnValidSellDates?). <sell> m_VTI_priceChPct_day >= -0.9; ..
+                                               __ABS__             _______________DAYS________________                    ___________PORTFOLIO___________
+  yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk   span       %     min$    max$    fin$ ni  
+pfolio                0    0.0                                                0                           0         2004     0.0   100000  100000  100000  0  
+pfolio    2.04       92    5.0   35  57 53 46   39 11       188     2.53     53    4.6   28  57 51 47    24         2005    12.9   100000  111605  112937  5  
+pfolio    1.07      124    5.5   37  56 44 44   44 15       133      1.2     67    4.5   31  57 46 46    67         2006     8.2   100000  109507  108194 10  
+pfolio   -0.48      115    5.8   40  50 39 57   40 18       -55    -0.39     62    5.5   40  52 44 55    67         2007    -5.4    94624  106533   94624  9  
+pfolio    2.74      180   13.7   47  51 49 46   76 52       492     2.85     97   11.4   42  54 51 46    99         2008    32.3    98765  136638  132258 14  
+pfolio    1.14      143    8.9   42  50 42 42   59 36       163     0.68     77    7.8   42  49 44 44    77         2009     8.0    81187  108277  108047 11  
+pfolio    1.22      132    6.8   41  54 47 46   52 25       161     1.21     67    5.7   42  49 43 43    64         2010     9.8    93445  109780  109780  2  
+pfolio    0.98      149    7.3   42  54 48 48   53 26       146      0.9     79    6.7   47  51 48 48    75         2011     7.9    91544  107925  107925 15  
+pfolio    0.75      128    6.6   43  51 47 48   52 20        96     0.51     67    5.6   39  60 57 57    70         2012     4.8    98402  105859  104840  6  
+pfolio    2.32      118    6.2   31  62 55 45   36 19       273     2.35     62    4.7   23  68 61 47    70         2013    19.6    99730  119568  119568  6  
+pfolio   -0.05      117    7.2   40  56 48 56   52 22        -6     0.28     60    6.6   37  55 50 55    65         2014    -2.6    89083  103683   97416  3  
+pfolio    3.98       49    8.5   37  55 53 41   53 33       195      3.8     25    7.4   32  60 56 40    41         2015    13.9    99236  114893  113895  1  
+                                               __ABS__             _______________DAYS________________                    ___________PORTFOLIO___________
+  yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk   span       %     min$    max$    fin$ ni  
+pfolio    1.38     1368    7.8   40  54 47 46   52 26      1890      1.4    727    6.7   38  55 50 47   334     8    all   194.8   100000  297325  294754 83  4.48s
+
+per exec: using 1113 tickers, from A to ZZZZ, startingdate: 20040101. subset offset, fraction: (0, 4). using X's: [class objects.prices.X, class objects.earnings.X, class objects.finance.X, class objects.sec.X, class objects.profile.X].  excluding catTypes: [GOOGLE_INDUSTRY, GOOGLE_SECTOR, YAHOO_INDUSTRY, YAHOO_SECTOR]
+per filt: R, rank1: 10 priceChPct_day increasing, vol >= 1000000; Sec_NumReports <= 0; close >= 5; AG_3 <= 0.4; ema3m5 <= 0.1; Earnings_numDaysSince >= 2; PE >= -3; PFCF <= 40 AND >= -40; rc PFCF >= -1; m_VTI_priceChPct_day <= -0.25; 
+prtfolio: [12, 2, 100000, 6, true, true, true, true] (maxStocks, perDay, init$, minHoldDays, sellASAP?, allowDD?, useFees?, onlySellOnValidSellDates?). <sell> m_VTI_priceChPct_day >= -0.9; ..
+                                               __ABS__             _______________DAYS________________                    ___________PORTFOLIO___________
+  yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk   span       %     min$    max$    fin$ ni  
+pfolio                0    0.0                                                0                           0         2004     0.0   100000  100000  100000  0  
+pfolio    1.36       86    4.1   31  60 47 43   31  6       117     1.12     52    3.6   29  63 48 44    22         2005     9.2    99629  110316  109200 10  
+pfolio    0.65      125    5.2   46  49 42 42   38 12        82     0.77     67    4.5   43  46 45 45    71         2006     5.0    97377  105150  105009  9  
+pfolio    0.23      115    5.1   38  55 45 53   40 10        26     0.16     62    4.8   42  52 48 50    72         2007     0.7    98751  104434  100658  9  
+pfolio    3.57      183   13.0   43  52 50 38   69 45       654     3.65     94   11.3   46  50 49 41    95         2008    55.4    92231  155872  155405  7  
+pfolio    2.31      143   10.7   40  55 52 48   64 38       331     2.41     77    9.3   35  61 56 53    72         2009    22.9    78798  129283  122913 11  
+pfolio    0.34      127    6.0   42  52 46 47   43 18        43     0.52     67    5.2   40  52 46 52    78         2010     1.6    90563  102577  101631  7  
+pfolio    1.04      158    7.9   49  49 45 45   54 30       164     0.97     81    6.7   46  52 46 46    85         2011     9.7    94500  110580  109670  4  
+pfolio    0.80      130    5.6   38  56 52 52   36 13       105     1.05     67    4.3   33  54 43 45    75         2012     6.7    97979  106652  106652  4  
+pfolio    0.82      119    5.5   37  53 47 47   40 13        97     0.82     62    4.5   45  48 39 40    63         2013     6.3    95696  106256  106256  5  
+pfolio    0.92      115    6.3   42  51 47 48   43 18       106     0.66     60    5.1   35  55 48 48    69         2014     6.8    98314  107247  106782  5  
+pfolio    0.44       49    6.2   41  53 45 49   47 16        22      0.6     26    5.4   42  54 54 54    37         2015     0.7    94102  101819  100738  3  
+                                               __ABS__             _______________DAYS________________                    ___________PORTFOLIO___________
+  yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk   span       %     min$    max$    fin$ ni  
+pfolio    1.32     1371    7.4   41  53 47 46   48 23      1805     1.34    726    6.3   40  53 48 46   334     8    all   215.3    99629  318670  315302 75  13.96s
+
+per exec: using 1159 tickers, from A to ZZZZ, startingdate: 20040101. subset offset, fraction: (2, 4). using X's: [class objects.prices.X, class objects.earnings.X, class objects.finance.X, class objects.sec.X, class objects.profile.X].  excluding catTypes: [GOOGLE_INDUSTRY, GOOGLE_SECTOR, YAHOO_INDUSTRY, YAHOO_SECTOR]
+per filt: R, rank1: 10 priceChPct_day increasing, vol >= 1000000; Sec_NumReports <= 0; close >= 5; AG_3 <= 0.4; ema3m5 <= 0.1; Earnings_numDaysSince >= 2; PE >= -3; PFCF <= 40 AND >= -40; rc PFCF >= -1; m_VTI_priceChPct_day <= -0.25; 
+prtfolio: [12, 2, 100000, 6, true, true, true, true] (maxStocks, perDay, init$, minHoldDays, sellASAP?, allowDD?, useFees?, onlySellOnValidSellDates?). <sell> m_VTI_priceChPct_day >= -0.9; ..
+                                               __ABS__             _______________DAYS________________                    ___________PORTFOLIO___________
+  yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk   span       %     min$    max$    fin$ ni  
+pfolio                0    0.0                                                0                           0         2004     0.0   100000  100000  100000  0  
+pfolio    1.28      116    4.5   28  61 53 51   33  8       148     1.46     68    3.6   24  69 57 54    27         2005    10.9    96415  110795  110916  5  
+pfolio    0.84      131    6.4   37  59 53 56   47 22       110     0.93     67    5.5   34  58 54 54    69         2006     6.8    92804  108991  106808  3  
+pfolio    1.85      110    6.2   34  55 50 45   42 16       203     1.81     62    5.4   31  58 52 40    70         2007    16.7    98771  116741  116741 14  
+pfolio    2.94      175   12.3   42  55 51 41   61 39       515      2.6     93   11.0   34  59 53 39    99         2008    39.0    96607  139005  139005 15  
+pfolio    2.62      150   10.4   44  54 50 43   72 43       392     2.66     77    8.7   35  58 51 40    83         2009    30.3    88708  135194  130348  4  
+pfolio    2.04      131    6.1   40  56 49 44   47 18       267     1.96     67    5.2   36  60 51 46    77         2010    21.8    93442  121814  121814  3  
+pfolio   -0.03      157    8.0   45  48 43 49   54 29        -5     -0.1     81    7.1   51  41 37 42    84         2011    -5.2    88175  106128   94839  5  
+pfolio    0.43      132    7.1   40  55 48 54   55 24        56      0.5     67    6.3   37  55 48 52    65         2012     1.2    90071  103452  101232  2  
+pfolio    0.52      120    5.7   40  53 49 52   34 17        62     0.54     62    4.3   44  52 44 50    72         2013     3.3    97690  104904  103305  4  
+pfolio   -0.35      115    7.3   40  52 46 55   46 27       -40    -0.17     60    6.2   42  50 45 52    67         2014    -5.9    86862  101360   94080  5  
+pfolio    3.49       51    7.5   31  63 55 45   53 25       178     4.13     26    5.9   31  65 62 46    38         2015    14.7    98903  114743  114743  1  
+                                               __ABS__             _______________DAYS________________                    ___________PORTFOLIO___________
+  yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk   span       %     min$    max$    fin$ ni  
+pfolio    1.30     1409    7.7   39  55 49 47   50 25      1829     1.33    741    6.6   37  56 50 48   349     9    all   211.7    96415  311659  311659 62  14.23s
+
+per exec: using 1129 tickers, from A to ZZZZ, startingdate: 20040101. subset offset, fraction: (3, 4). using X's: [class objects.prices.X, class objects.earnings.X, class objects.finance.X, class objects.sec.X, class objects.profile.X].  excluding catTypes: [GOOGLE_INDUSTRY, GOOGLE_SECTOR, YAHOO_INDUSTRY, YAHOO_SECTOR]
+per filt: R, rank1: 10 priceChPct_day increasing, vol >= 1000000; Sec_NumReports <= 0; close >= 5; AG_3 <= 0.4; ema3m5 <= 0.1; Earnings_numDaysSince >= 2; PE >= -3; PFCF <= 40 AND >= -40; rc PFCF >= -1; m_VTI_priceChPct_day <= -0.25; 
+prtfolio: [12, 2, 100000, 6, true, true, true, true] (maxStocks, perDay, init$, minHoldDays, sellASAP?, allowDD?, useFees?, onlySellOnValidSellDates?). <sell> m_VTI_priceChPct_day >= -0.9; ..
+                                               __ABS__             _______________DAYS________________                    ___________PORTFOLIO___________
+  yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk   span       %     min$    max$    fin$ ni  
+pfolio                0    0.0                                                0                           0         2004     0.0   100000  100000  100000  0  
+pfolio    1.24       95    4.0   29  63 56 53   31  9       118     1.27     50    3.4   26  68 52 48    27         2005     8.9    99159  111175  108933  3  
+pfolio    0.14      126    5.1   44  50 45 48   39 13        17     0.29     66    4.1   35  58 50 56    57         2006    -0.6    94295  102310   99428  8  
+pfolio    0.89      115    6.0   39  51 43 43   44 20       102     0.83     60    5.0   38  60 47 48    68         2007     7.0   100000  110900  107000  9  
+pfolio    2.03      182   13.0   45  52 49 47   73 43       369      2.1     95   11.3   43  53 47 45    98         2008    18.8    97542  127936  118837  8  
+pfolio    3.44      146   10.2   38  58 55 47   64 36       502     3.41     77    8.6   32  64 57 53    78         2009    43.2    90134  143909  143225  8  
+pfolio    0.64      131    5.6   42  53 43 47   43 18        84     0.62     67    5.0   43  51 43 45    61         2010     4.5    94923  104457  104457  3  
+pfolio   -0.59      160    9.6   50  46 43 49   62 39       -95    -0.48     81    8.5   49  44 42 48    74         2011   -13.7    72267  102065   86267  2  
+pfolio    1.64      128    6.0   41  55 53 48   53 14       210     1.65     66    4.8   35  55 48 42    69         2012    16.4   100000  116415  116415  6  
+pfolio    2.12      117    6.2   37  56 49 45   47 18       248        2     62    4.6   37  60 55 48    65         2013    20.4    99540  120524  120406  7  
+pfolio    0.57      118    6.9   44  53 48 49   50 23        67     0.65     60    5.6   43  48 47 47    67         2014     3.7    99497  108041  103698  2  
+pfolio    2.92       49    5.9   35  59 47 35   49 12       143     2.87     25    4.7   24  72 60 36    39         2015    11.7    98555  111736  111736  3  
+                                               __ABS__             _______________DAYS________________                    ___________PORTFOLIO___________
+  yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk   span       %     min$    max$    fin$ ni  
+pfolio    1.25     1389    7.7   41  54 48 46   53 25      1740     1.29    720    6.5   38  56 49 48   327     8    all   182.0    99159  282029  282029 59  14.23s
+
+
+next:
+ na# futChPct_2week, # futChPct_month, futChPct_2month, futChPct_6month, futChPct_year, #   futChPct_week ,  futChPct_2week,  futChPct_month,  futChPct_year # futChPct_2week,  futChPct_month, futChPct_2month, futChPct_6month,  futChPct_day, futChPct_2day, futChPct_8day,  futChPct_2week, futChPct_month,futChPct_day, futChPct_2day, futChPct_week,   futChPct_8day, futChPct_2week, futChPct_3week, futChPct_month, futChPct_2month, futChPct_6month #,  futChPct_year #futChPct_intraDay, futChPct_day, futChPct_2day, 
+10, priceChPct_day, increasing			# Rank1 stuff - numKeep, var, increasing/decreasing
+n10, priceChPct_week, increasing							# Rank2 stuff - numKeep, var, increasing/decreasing
+10, 3, 100000, 10, doSellASAP, canReBuy, doUseFees, dontUseSellDates  # maxStocks, maxPerDay, init$, minDays, doSellASAP/holdALAP, canrebuy/cant, useFees?, sellOnValidSellDatesOnly? ### #max porftolio size, max allocation, minimum hold time (days), holding mode (preferCash vs preferStock), allow purchase of already-held stock? (yes_allow_doubledowns).  will simulate portfolio if portfolio size > 0
+vol     			  		$  >=  100000  #	$  <=  10000000  
+ Sec_NumReports                  $  <= 0
+m_VTI_priceChPct_day  		$ <= -0.3				# between 0 and -.5
+close						$ >= 1
+AG_3                 		 $  <= .3                 
+ema3m5               		 $  <=  -.1            
+ema3m9               		 $  <=  0               
+ priceChPct_day      		 $  <=  -4              
+priceChPct_week      		 $  <=  -6      
+PE      			 		 $ >= -3 #$ <= 100				
+PFCF					$ <= 40 	 $ >= -40 		# added later, also:
+
+resULTS:
+
+per exec: using 1480 tickers, from A to ZZZZ, startingdate: 20040101. subset offset, fraction: (0, 3). using X's: [class objects.prices.X, class objects.earnings.X, class objects.finance.X, class objects.sec.X].  excluding catTypes: [GOOGLE_INDUSTRY, GOOGLE_SECTOR, YAHOO_INDUSTRY, YAHOO_SECTOR]
+per filt: R, rank1: 10 priceChPct_day increasing, vol >= 100000; Sec_NumReports <= 0; close >= 1; AG_3 <= 0.3; ema3m5 <= -0.1; ema3m9 <= 0; priceChPct_day <= -4; priceChPct_week <= -6; PE >= -3; PFCF <= 40 AND >= -40; m_VTI_priceChPct_day <= -0.3; 
+prtfolio: [10, 3, 100000, 10, true, true, true, false] (maxStocks, perDay, init$, minHoldDays, sellASAP?, allowDD?, useFees?, onlySellOnValidSellDates?)...
+                                               __ABS__             _______________DAYS________________                    ___________PORTFOLIO___________
+  yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk   span       %     min$    max$    fin$ ni  
+pfolio    1.78        7    4.6   29  71 71 57   43  0        12     1.78      7    4.6   29  71 71 57     2         2004     1.2    99418  101180  101180  0  
+pfolio    3.74       33    8.1   33  67 64 42   55 42       123     3.44     19    7.8   37  63 58 42    25         2005    11.9    95762  112499  111898  1  
+pfolio    2.24       95    8.2   39  56 52 43   54 32       213     3.89     41    7.4   34  63 61 46    79         2006    19.2    92462  119244  119244  8  
+pfolio    1.15      108    8.2   47  49 45 45   56 28       124     0.96     46    6.7   43  52 52 52    86         2007     8.8    90805  115776  108843  9  
+pfolio    1.53      174   16.0   46  52 50 49   76 51       267     2.16     74   13.4   39  58 54 53   123         2008     9.9    80305  112818  109892 11  
+pfolio    4.89      132   15.0   36  60 58 46   76 55       645     5.27     60   12.0   32  60 57 52    97         2009    67.4    69338  167351  167351 16  
+pfolio    1.17      116    8.9   46  53 48 47   59 30       136     1.11     49    7.8   47  53 47 47    90         2010     8.6    91851  112179  108647  2  
+pfolio    1.88      155   10.8   41  56 52 46   61 39       291     1.24     63    8.8   38  59 56 49   104         2011    19.4    98354  126209  119437  2  
+pfolio    0.90      107    8.6   40  56 52 53   64 31        96      0.9     48    6.8   42  56 52 52    77         2012     6.5   100000  110922  106488  2  
+pfolio    2.97      104    9.2   39  57 53 46   64 34       309     2.28     46    7.1   35  61 54 46    69         2013    31.1    99792  133623  131129  7  
+pfolio    2.05      111   12.3   48  47 43 37   59 35       228      1.9     44    9.8   48  48 41 36    87         2014    20.3    88941  120341  120341  3  
+pfolio    5.26       39    9.2   33  67 56 51   67 33       205     4.92     18    6.1   22  72 72 39    35         2015    20.9   100000  120869  120869  3  
+                                               __ABS__             _______________DAYS________________                    ___________PORTFOLIO___________
+  yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk   span       %     min$    max$    fin$ ni  
+pfolio    2.34     1208   10.9   41  55 52 46   65 37      2832     2.48    527    8.9   38  59 55 49   536     8    all   765.6    96890  865613  865613 63  5.43s
+
+
+(using ALL data) -->
+
+0, 0	# subset by date info!  (offset, fraction denominator).  eg, it loops through dates and only keeps those where (count + offset) % fractionDenominator == 0.
+0, 0	# subset by company info!  (offset, fraction denominator).  eg, it loops through dates and only keeps those where (count + offset) % fractionDenominator == 0.
+all_tickers #AFQ #	list specific tickers separated by commas, or "all_tickers"
+doPrintHitsToFile #print hits to a file?
+dontShowTodaysHits #doShowTodaysHits  will tell you today's picks!  takes longer.  use dontShowTodaysHits if not getting todays picks
+-1,  2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013,  2014, 2015 #,  2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013,  1995, 1996, 1997, 1998, 1999, 2000,2015,  Mon, Tues, Wed, Thurs, Fri  # ,  2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 #,  2014, 2015, #2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, #  Mon, Tues, Wed, Thurs, Fri 
+ na# futChPct_2week, # futChPct_month, futChPct_2month, futChPct_6month, futChPct_year, #   futChPct_week ,  futChPct_2week,  futChPct_month,  futChPct_year # futChPct_2week,  futChPct_month, futChPct_2month, futChPct_6month,  futChPct_day, futChPct_2day, futChPct_8day,  futChPct_2week, futChPct_month,futChPct_day, futChPct_2day, futChPct_week,   futChPct_8day, futChPct_2week, futChPct_3week, futChPct_month, futChPct_2month, futChPct_6month #,  futChPct_year #futChPct_intraDay, futChPct_day, futChPct_2day, 
+10, priceChPct_day, increasing			# Rank1 stuff - numKeep, var, increasing/decreasing
+n100, PFCF, increasing							# Rank2 stuff - numKeep, var, increasing/decreasing
+10, 2, 100000, 5, doSellASAP, canReBuy, doUseFees, dontUseSellDates  # maxStocks, maxPerDay, init$, minDays, doSellASAP/holdALAP, canrebuy/cant, useFees?, sellOnValidSellDatesOnly? ### #max porftolio size, max allocation, minimum hold time (days), holding mode (preferCash vs preferStock), allow purchase of already-held stock? (yes_allow_doubledowns).  will simulate portfolio if portfolio size > 0
+
+
+
+vol     			  		$  >=  100000  
+m_VTI_priceChPct_day  		$ <= .5
+# m_VTI_priceChPct_week 		$ <= 0
+m_VTI_ema3m5 		  		$ <= 0
+AG_3                 		 $  <= .5                 
+ema3m5               		 $  <=  .1
+ema3m9               		 $  <=  -.1               
+priceChPct_day       		 $   <= -2
+priceChPct_week      		 $  <=  -2                 
+priceChPct_month     		 $  <=  -2               
+priceChPct_2month    		 $  <=  -4 
+Earnings_numDaysSince		 $ >= 1		
+PE      			  $ >= -1 
+
+PE      			  $ <= 15
+PFCF				$ <= 15
+# eps							$ >= 1
+# fcfps						$ >= 1
+close					$ >= 1
+
+
+
+resulTS:
+
+per exec: using 4629 tickers, from A to ZZZZ, startingdate: 20050101. subset offset, fraction: (null, null). using X's: [class objects.prices.X, class objects.finance.X, class objects.earnings.X].  excluding catTypes: [GOOGLE_INDUSTRY, GOOGLE_SECTOR, YAHOO_INDUSTRY, YAHOO_SECTOR]
+per filt: R, rank1: 10 priceChPct_day increasing, vol >= 100000; AG_3 <= 0.5; ema3m5 <= 0.1; ema3m9 <= -0.1; priceChPct_day <= -2; priceChPct_week <= -2; priceChPct_month <= -2; priceChPct_2month <= -4; Earnings_numDaysSince >= 1; PE >= -1; PE <= 15; PFCF <= 15; close >= 1; m_VTI_priceChPct_day <= 0.5; m_VTI_ema3m5 <= 0; 
+prtfolio: [10, 2, 100000, 5, true, true, true, false] (maxStocks, perDay, init$, minHoldDays, sellASAP?, allowDD?, useFees?, onlySellOnValidSellDates?)...
+                                               __ABS__             _______________DAYS________________                    ___________PORTFOLIO___________
+  yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk   span       %     min$    max$    fin$ ni  
+pfolio                0    0.0                                                0                           0         2004     0.0   100000  100000       0  0  
+pfolio    1.34       56    3.7   30  52 46 45   25  5        75     1.08     36    3.3   33  56 47 42    32         2005     6.6    99108  106556  106556  4  
+pfolio    0.57      127    5.2   39  57 50 52   39 12        73     0.42     69    4.4   39  54 48 49    86         2006     3.8    94679  103784  103784  7  
+pfolio    1.20      133    9.0   48  49 47 46   53 35       159      1.4     67    7.6   42  52 49 49    90         2007    11.8    91466  115548  111763  1  
+pfolio    6.30      171   15.7   41  58 56 40   70 51      1077     5.88     87   13.5   37  61 56 36   136         2008   137.6    95132  241235  237560  3  
+pfolio    3.29      113   15.1   39  58 56 49   69 47       371     2.87     58   13.5   36  62 60 50    91         2009    31.8    85596  131846  131846  3  
+pfolio    2.27      113    8.8   37  58 55 50   58 32       257     2.21     57    7.2   37  60 56 47    79         2010    20.3    94139  120335  120335  1  
+pfolio    0.44      157    8.6   40  54 52 53   57 31        69     0.38     79    6.8   43  53 44 51   109         2011    -2.7    89118  109984   97334  1  
+pfolio    5.08      120   13.9   40  53 49 31   68 42       610     5.16     63   11.6   38  57 51 33    89         2012    61.2    91275  164749  161156  6  
+pfolio    1.05      100    6.1   39  54 49 49   42 18       105     1.05     51    4.9   35  57 51 49    75         2013     5.3    97444  111350  105339  2  
+pfolio    3.45      134   11.2   37  56 51 39   60 33       462     3.45     67    9.3   34  63 54 39   101         2014    39.9    93289  139944  139944  0  
+pfolio    6.11       41   16.6   56  41 41 29   73 46       251     5.92     21   14.0   48  52 52 29    37         2015    22.1    93363  123761  122132  1  
+                                               __ABS__             _______________DAYS________________                    ___________PORTFOLIO___________
+  yVar     ave        n     ad   l-1 g0 g1 gA   g5 10     ave*n      ave      n     ad   l-1 g0 g1 gA   nCo  HpWk   span       %     min$    max$    fin$ ni  
+pfolio    2.77     1265   10.4   40  55 51 42   58 32      3510     2.64    655    8.7   38  57 52 40   702     9    all  1231.8    99108 1349564 1331829 29  15.05s
+
+<-- this might actually be useful

@@ -1,0 +1,17 @@
+
+earnings downloaders:
+
+should download going forward starting with the last-modified date of the downloaded file.  in case data on those earnings changed since then.  actually whichever's smaller - the last recorded date, or the last-modified date
+
+
+i think it would be better if there was a Download object that extended to different downloaders.  and then put the downloaders inside the objects folder/package
+
+
+
+what's the MO for exceptions?  
+
+1.   do we want each downloader to be bulletproof?  and handle all exceptions internally?
+2.   do we want to catch all exceptions per each ticker's download? -- YES
+3.   do we want to catch all exceptions per the ticker loop?
+4.   do we want to catch all exceptions per the entire downloader?
+5.   do we watn to cathcall exlcasldkfj in the agent?  let the downloader throw them up?qQ
