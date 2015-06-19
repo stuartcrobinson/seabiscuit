@@ -57,8 +57,7 @@ public class G {
     public static final String fileDateStampStr = "20150508";
     public static String minDataDownloadYear = "2000";
 
-    ;
-
+    
     /** this can either be a constant (set for testing, so we don't have to make all data up-to-date all the time, or set to today's actual date for production */
 
     public static Float parse_nonPrimitive(float x) {

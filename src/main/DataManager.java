@@ -151,7 +151,7 @@ public class DataManager {
 	this.minDate = minDate;
     }
 
-    /** this only affects loading from raw data */
+    /** this only affects loading from raw data.  if subsetFractionDenominator = 3, then this should load only a third of the data  */
     void set_subset_offset_and_fractionDenominator(int subsetOffSet, int subsetFractionDenominator) {
 	this.subsetFractionDenominator = subsetFractionDenominator;
 	this.subsetOffSet = subsetOffSet;

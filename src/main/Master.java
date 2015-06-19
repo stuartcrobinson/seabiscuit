@@ -35,7 +35,7 @@ public class Master {
 	data.setMinDate(20050101);
 	data.x_objects_to_use__by_class(objects.prices.X.class, objects.finance.X.class, objects.earnings.X.class);//, objects.sec.X.class);//, objects.profile.X.class);//, objects.news.X.class, objects.sec.X.class, objects.profile.X.class);//, objects.short_interest.X.class);//,,,,objects.splits.X.class, objects.short_interest.X.class,  objects.people.X.class); //, objects.profile.X.class, objects.finance.X.class, objects.people.X.class,  objects.earnings.X.class, objects.news.X.class, objects.profile.X.class, objects.sec.X.class, objects.short_interest.X.class, objects.finance.X.class, objects.people.X.class, objects.short_interest.X.class, objects.earnings.X.class,  ,  objects.news.X.class, objects.profile.X.class, objects.sec.X.class,
 //	data.set_subset_offset_and_fractionDenominator(0, 2);
-//	data.setMinMaxTickers("AAN", "AAP");
+	data.setMinMaxTickers("AAN", "AAP");
 	data.load(From.RAW);
 //	data.updateFromWeb();
 //	data.printMegaTable();
@@ -43,6 +43,7 @@ public class Master {
 	data.prepareForScreen();
 	Scanner input = new Scanner(System.in);
 	String nextLine;
+	System.out.println("filter file location: " + G.filter_file);
 	System.out.println(((double)((new Date()).getTime() - timer0) / 1000.0) + " seconds. " + "enter \"quit\"  or q to quit");
 	do {
 	    try {
@@ -70,6 +71,5 @@ public class Master {
 //TODO -- when running portfolio - make averaging values use the investments' buy and sell prices!  not the y-value
 // TODO - build set of days that pass certain macro-level SELL conditions.  and then only sell on those dates.  like when VTIpctChDay >= 0
 // TODO -  harvest options prices
-//TODO  m_date wrong.	    MAYBE ALL MACROS ARE WRONG????? ------ couldn't reproduce :/
 //todo -- find filter that isn't so market-dependent
 //NEXT, dust off the IB code!
