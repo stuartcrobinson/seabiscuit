@@ -1,4 +1,4 @@
-Seabiscuit.  Note:  It has been a month since working on this, so this document probably contains mistakes.  This was written to give a general description, purely for the purposes of job applications, and not as an accurate or professional readme/instructions.
+Seabiscuit.  Note:  It has been a month since working on this, so this document probably contains mistakes.  This was written to give a general description, for personal records, and not as a professional public readme/instructions.
 
 ----------------------------------------------------------------------------------------------
 The long-term purpose of this project is to essentially be a fully automated hedge fund.  The goal was to see if there are any significant stock market opportunities for relatively small initial investments.
