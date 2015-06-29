@@ -20,6 +20,7 @@ import categories.C;
 import categories.CatAves;
 import categories.Seasons;
 import java.util.Iterator;
+import java.util.function.Predicate;
 import objects.earnings.Earnings;
 import objects.prices.CurrentPrices;
 
@@ -408,7 +409,11 @@ public class Stock {
 
 	Set<String> tickers = G.getTickers(G.XPrices_vars);
 
-	tickers.removeIf((Object t) -> ((String)t).compareTo(min) < 0 || ((String)t).compareTo(max) > 0);
+	tickers.removeIf(new Predicate<Object>() {
+	    public boolean test(Object t) {
+		return ((String)t).compareTo(min) < 0 || ((String)t).compareTo(max) > 0;
+	    }
+	});
 
 	List<Stock> stocks = new ArrayList(tickers.size());
 
@@ -480,7 +485,11 @@ public class Stock {
 	    stock.clearTemporaryVariables();
 	}
 
-	stocks.removeIf((Object t) -> ((Stock)t).missingCriticalData);
+	stocks.removeIf(new Predicate<Object>() {
+	    public boolean test(Object t) {
+		return ((Stock)t).missingCriticalData;
+	    }
+	});
 
 	return stocks;
     }

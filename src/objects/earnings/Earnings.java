@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -458,9 +459,17 @@ public class Earnings implements Comparable {
 //	System.out.println("removing duplicates...");
 //	Earnings.removeDuplicatesFromList(earningsInfos);
 	System.out.println("sorting by ticker...");
-	Collections.sort(earningsInfos, (Earnings o1, Earnings o2) -> o1.ticker.compareTo(o2.ticker));
+	Collections.sort(earningsInfos, new Comparator<Earnings>() {
+	    public int compare(Earnings o1, Earnings o2) {
+		return o1.ticker.compareTo(o2.ticker);
+	    }
+	});
 	System.out.println("sorting by date...");
-	Collections.sort(earningsInfos, (Earnings o1, Earnings o2) -> o2.date.compareTo(o1.date));	//reverse
+	Collections.sort(earningsInfos, new Comparator<Earnings>() {
+	    public int compare(Earnings o1, Earnings o2) {
+		return o2.date.compareTo(o1.date);
+	    }
+	});	//reverse
 
 	List<String> lines = new ArrayList();
 

@@ -3,73 +3,24 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/filter_tools/Screen.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/downloaders/downloadmaster/Agent_4.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/utilities/Download_DeleteEmptyFiles.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/comparators/MyComparator_float_LtE.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/downloaders/regular_other/Replace_Symbols.java</file>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/supers/Var.java</file>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/main/DataManager.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/filter_tools/FilterFileException.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/filter_tools/futChPct_pfolio.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/objects/prices/X.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/filter_tools/SubconditionText.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/downloaders/downloadmaster/Agent_Google.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/objects/prices/HistoricalPrices.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/objects/Stock.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/conditions/VarCondition_OR_String.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/objects/prices/Prices.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/main/Test.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/objects/prices/YahooHistoricalPrices_Row.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/supers/VarInterface.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/objects/sec/X.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/filter_tools/ProductionManagerInterface.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/downloaders/downloadmaster/Agent_NonPartitions.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/downloaders/downloadmaster/Agent_0.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/downloaders/regular_stocks_stuff/UdFlow_Earnings_Yahoo.java</file>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/conditions/VarCondition.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/categories/category_earnings_response/Y.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/objects/news/News.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/categories/C.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/objects/finance/X.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/downloaders/downloadmaster/Agent_3.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/objects/short_interest/X.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/downloaders/regular_stocks_stuff/Replace_Financials.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/objects/earnings/Earnings.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/filter_tools/Hit.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/downloaders/downloadmaster/Agent_1.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/filter_tools/ResultsHandler.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/filter_tools/ProductionManager_Inactive.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/filter_tools/Portfolio.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/supers/SuperX.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/filter_tools/ProductionManager_Active.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/downloaders/regular_stocks_stuff/Replace_Prices_Daily.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/downloaders/regular_stocks_stuff/UdFlow_Earnings_Zacks.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/categories/CatAves.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/conditions/Subcondition_String.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/supers/SuperXInterface.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/objects/news/X.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/downloaders/regular_stocks_stuff/UdFlow_SecReportDates.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/main/MetaData.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/objects/splitsAndDividends/Split.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/objects/profile/Profile_EraDataRow.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/categories/Seasons.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/objects/short_interest/ShortInterest.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/main/Master.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/filter_tools/ConditionDetails.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/objects/earnings/X.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/downloaders/downloadmaster/Agent_2.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/main/notes</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/downloaders/regular_other/Replace_Weather.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/comparators/MyComparator.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/comparators/MyComparator_float_E.java</file>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/conditions/EraCondition.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/downloaders/regular_stocks_stuff/UdFlow_Splits.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/comparators/MyComparatorInterface.java</file>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/conditions/VarCondition_AND_float.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/objects/people/X.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/filter_tools/Investment.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/downloaders/regular_stocks_stuff/UdFlow_Earnings_Estimize.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/filter_tools/TemplateScreen.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/filter_tools/ProductionManager.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/utilities/G.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/objects/earnings/Earnings_EraDataRow.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/utilities/HttpDownloadUtility.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/downloaders/regular_stocks_stuff/UdSttc_Profile_Yahoo.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/objects/finance/MsFinancialDownload.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/conditions/Condition.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/conditions/Subcondition_float.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/conditions/EraCondition_AND.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/analyze/conditions/VarConditionInterface.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/downloaders/regular_stocks_stuff/Replace_Financials.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/Seabiscuit/src/supers/VarInterface.java</file>
         </group>
     </open-files>
 </project-private>

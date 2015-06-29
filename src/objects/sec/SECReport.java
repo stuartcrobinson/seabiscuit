@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -129,8 +130,16 @@ public final class SECReport {
 
     /** sort by date in reverse for newest on top */
     private static List<SECReport> sortByTypeThenTimestamp(List<SECReport> list) {
-	Collections.sort(list, (SECReport o1, SECReport o2) -> o1.type.compareTo(o2.type));
-	Collections.sort(list, (SECReport o1, SECReport o2) -> o2.timestamp.compareTo(o1.timestamp)); //reverse
+	Collections.sort(list, new Comparator<SECReport>() {
+	    public int compare(SECReport o1, SECReport o2) {
+		return o1.type.compareTo(o2.type);
+	    }
+	});
+	Collections.sort(list, new Comparator<SECReport>() {
+	    public int compare(SECReport o1, SECReport o2) {
+		return o2.timestamp.compareTo(o1.timestamp);
+	    }
+	}); //reverse
 	return list;
     }
 

@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -338,9 +339,21 @@ public final class News implements Comparable {
 
     public static List<News> finalSort(List<News> newsList) {
 
-	Collections.sort(newsList, (News news1, News news2) -> news2.time.compareTo(news1.time)); //reverse
-	Collections.sort(newsList, (News news1, News news2) -> news2.date.compareTo(news1.date)); //reverse
-	Collections.sort(newsList, (News news1, News news2) -> news2.aggregator.compareTo(news1.aggregator));//reverse
+	Collections.sort(newsList, new Comparator<News>() {
+	    public int compare(News news1, News news2) {
+		return news2.time.compareTo(news1.time);
+	    }
+	}); //reverse
+	Collections.sort(newsList, new Comparator<News>() {
+	    public int compare(News news1, News news2) {
+		return news2.date.compareTo(news1.date);
+	    }
+	}); //reverse
+	Collections.sort(newsList, new Comparator<News>() {
+	    public int compare(News news1, News news2) {
+		return news2.aggregator.compareTo(news1.aggregator);
+	    }
+	});//reverse
 	return newsList;
     }
 

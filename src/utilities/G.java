@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.htmlcleaner.CleanerProperties;
@@ -1115,7 +1116,11 @@ public class G {
 		tickers.remove(indexToRemove);
 	}
 
-	tickers.removeIf((Object t) -> t.toString().compareTo(maxTicker) > 0);
+	tickers.removeIf(new Predicate<Object>() {
+	    public boolean test(Object t) {
+		return t.toString().compareTo(maxTicker) > 0;
+	    }
+	});
 
 	return tickers;
     }

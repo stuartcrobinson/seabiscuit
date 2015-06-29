@@ -25,6 +25,7 @@ import java.io.FileReader;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.function.Predicate;
 import objects.Macro;
 import objects.Macro_float;
 import objects.Macro_int;
@@ -226,9 +227,17 @@ public final class Screen {
 		throw new InvalidMetricName(rank1LineParameters[1].trim());
 	    }
 	    if (doRank1Increasing)
-		rank1Comparator = (Comparator<Hit>)(Hit h1, Hit h2) -> Float.compare(h1.rank1Value, h2.rank1Value);
+		rank1Comparator = (Comparator<Hit>)new Comparator<Hit>() {
+		public int compare(Hit h1, Hit h2) {
+		    return Float.compare(h1.rank1Value, h2.rank1Value);
+		}
+	    };
 	    else
-		rank1Comparator = (Comparator<Hit>)(Hit h1, Hit h2) -> Float.compare(h2.rank1Value, h1.rank1Value);
+		rank1Comparator = (Comparator<Hit>)new Comparator<Hit>() {
+		public int compare(Hit h1, Hit h2) {
+		    return Float.compare(h2.rank1Value, h1.rank1Value);
+		}
+	    };
 	} else {
 	    rank1Comparator = null;
 	    rank1MetricVarClass = null;
@@ -240,9 +249,17 @@ public final class Screen {
 		throw new InvalidMetricName(rank2LineParameters[1].trim());
 	    }
 	    if (doRank1Increasing)
-		rank2Comparator = (Comparator<Hit>)(Hit h1, Hit h2) -> Float.compare(h1.rank2Value, h2.rank2Value);
+		rank2Comparator = (Comparator<Hit>)new Comparator<Hit>() {
+		public int compare(Hit h1, Hit h2) {
+		    return Float.compare(h1.rank2Value, h2.rank2Value);
+		}
+	    };
 	    else
-		rank2Comparator = (Comparator<Hit>)(Hit h1, Hit h2) -> Float.compare(h2.rank2Value, h1.rank2Value);
+		rank2Comparator = (Comparator<Hit>)new Comparator<Hit>() {
+		public int compare(Hit h1, Hit h2) {
+		    return Float.compare(h2.rank2Value, h1.rank2Value);
+		}
+	    };
 	} else {
 	    rank2Comparator = null;
 	    rank2MetricVarClass = null;
@@ -604,12 +621,20 @@ public final class Screen {
 	    return date_i__map;
 	if (datesUniverse.isEmpty())
 	    return new LinkedHashMap();
-	date_i__map.entrySet().removeIf((Map.Entry<Integer, Integer> t) -> !datesUniverse.contains(t.getKey()));
+	date_i__map.entrySet().removeIf(new Predicate<Map.Entry<Integer, Integer>>() {
+	    public boolean test(Map.Entry<Integer, Integer> t) {
+		return !datesUniverse.contains(t.getKey());
+	    }
+	});
 	return date_i__map;
     }
 
     private void removeDatesFromMapWhichArentInAnyOfTheseEras(Map<Integer, Integer> date_i__map, List<Era> passingEras) {
-	date_i__map.entrySet().removeIf((Map.Entry<Integer, Integer> t) -> !Era.erasContainDate(passingEras, t.getKey()));
+	date_i__map.entrySet().removeIf(new Predicate<Map.Entry<Integer, Integer>>() {
+	    public boolean test(Map.Entry<Integer, Integer> t) {
+		return !Era.erasContainDate(passingEras, t.getKey());
+	    }
+	});
     }
 
 
